@@ -100,7 +100,7 @@ type
     function Descricao: string;
   end;
 
-  TListaSituacaoTribCibs = specialize TFPGList<ISituacaoTributariaOutput>;
+  TListaSituacaoTributaria = specialize TFPGList<ISituacaoTributariaOutput>;
 
   INcmOutput = interface
     ['{A1E9A5D8-9D2C-4F1F-AE24-7A4E5E7B2B2E}']
@@ -300,7 +300,7 @@ type
 
   function ParseListaUF(AData: TJSONData): TListaUF;
   function ParseListaMunicipio(AData: TJSONData): TListaMunicipio;
-  function ParseListaSitTribCibs(AData: TJSONData): TListaSituacaoTribCibs;
+  function ParseListaSituacaoTributaria(AData: TJSONData): TListaSituacaoTributaria;
   function ParseListaNCM(AData: TJSONData): TListaNCM;
   function ParseListaNBS(AData: TJSONData): TListaNBS;
   function ParseListaFundClass(AData: TJSONData): TListaFundClass;
@@ -337,12 +337,13 @@ begin
     Result.Add(TMunicipioOutput.FromJSON(LArr.Objects[I]));
 end;
 
-function ParseListaSitTribCibs(AData: TJSONData): TListaSituacaoTribCibs;
+function ParseListaSituacaoTributaria(AData: TJSONData
+  ): TListaSituacaoTributaria;
 var
   LArr: TJSONArray;
   I: Integer;
 begin
-  Result := TListaSituacaoTribCibs.Create;
+  Result := TListaSituacaoTributaria.Create;
   if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 

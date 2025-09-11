@@ -66,7 +66,7 @@ type
     edtXMLTipo: TEdit;
     edtXMLSubtipo: TEdit;
 
-    edtDataISO: TEdit;
+    edtDataBase: TEdit;
     edtSiglaUF: TEdit;
     edtCodigoUF: TEdit;
     edtCodigoMunicipio: TEdit;
@@ -76,7 +76,7 @@ type
     edtNbsQuery: TEdit;
 
     MemoXML: TMemo;
-    MemoROC: TMemo;
+    MemoResp: TMemo;
     MemoLog: TMemo;
 
     pnlConfig: TGroupBox;
@@ -195,7 +195,7 @@ begin
   edtXMLTipo.Text := 'nfe';
   edtXMLSubtipo.Text := 'grupo';
 
-  edtDataISO.Text := '2026-01-01';
+  edtDataBase.Text := '2026-01-01';
   edtSiglaUF.Text := 'SP';
   edtCodigoUF.Text := '35';
   edtCodigoMunicipio.Text := '3554003';
@@ -255,8 +255,6 @@ function TFormCalcDemo.StrToInt64Safe(const AText: string): Int64;
 begin
   Result := StrToInt64Def(Trim(AText), 0);
 end;
-
-{ ===== Cálculo ===== }
 
 procedure TFormCalcDemo.btnCalcularRegimeGeralJSONClick(Sender: TObject);
 var
@@ -328,7 +326,7 @@ begin
       end;
 
       LROC := fpCalculadora.CalcularRegimeGeral(LOperacaoInput);
-      MemoROC.Lines.Text := LROC.total.tribCalc.IBSCBSTot.vBCIBSCBS.ToString;
+      MemoResp.Lines.Text := LROC.total.tribCalc.IBSCBSTot.vBCIBSCBS.ToString;
       LogOk('Regime Geral (Tipado)');
   except
     on E: Exception do LogError(E);
@@ -492,19 +490,17 @@ end;
 
 procedure TFormCalcDemo.btnVersaoClick(Sender: TObject);
 var
-  D: TJSONData;
   LVersao: IVersaoOutput;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarVersao;
-    LVersao := TVersaoOutput.FromJSON(TJSONObject(D));
-    try
-      LogJSON('Versão', D);
-      MemoROC.Lines.Add(LVersao.VersaoApp);
-    finally
-      D.Free;
-    end;
+    LVersao := fpCalculadora.ConsultarVersao;
+    MemoResp.Lines.Clear;
+    MemoResp.Lines.Add(LVersao.VersaoApp);
+    MemoResp.Lines.Add(LVersao.VersaoDb);
+    MemoResp.Lines.Add(LVersao.DataVersaoDb);
+    MemoResp.Lines.Add(LVersao.Ambiente);
+    MemoResp.Lines.Add(LVersao.DescricaoVersaoDb);
   except
     on E: Exception do LogError(E);
   end;
@@ -512,16 +508,14 @@ end;
 
 procedure TFormCalcDemo.btnUFsClick(Sender: TObject);
 var
-  D: TJSONData;
+  LListaUF: TListaUF;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarUfs;
-    try
-      LogJSON('UFs', D);
-    finally
-      D.Free;
-    end;
+    LListaUF := fpCalculadora.ConsultarUfs;
+    MemoResp.Clear;
+    MemoResp.Lines.Add(LListaUF.Count.ToString);
+    MemoResp.Lines.Add(LListaUF.Items[0].Sigla);
   except
     on E: Exception do LogError(E);
   end;
@@ -529,19 +523,14 @@ end;
 
 procedure TFormCalcDemo.btnMunicipiosUFClick(Sender: TObject);
 var
-  D: TJSONData;
   LListaMun: TListaMunicipio;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarMunicipiosPorSiglaUf(edtSiglaUF.Text);
-    try
-      LListaMun := ParseListaMunicipio(D);
-      LogJSON('Municípios por UF', D);
-      MemoROC.Lines.Add(Format('Total de Municípios: %d',[LListaMun.Count]));
-    finally
-      D.Free;
-    end;
+    LListaMun := fpCalculadora.ConsultarMunicipiosPorSiglaUf(edtSiglaUF.Text);
+    MemoResp.Lines.Clear;
+    MemoResp.Lines.Add(Format('Total de Municípios: %d',[LListaMun.Count]));
+    MemoResp.Lines.Add(LListaMun.Items[0].Nome);
   except
     on E: Exception do LogError(E);
   end;
@@ -549,16 +538,15 @@ end;
 
 procedure TFormCalcDemo.btnSTISClick(Sender: TObject);
 var
-  D: TJSONData;
+  LListaSitTribIS: TListaSituacaoTributaria;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarSituacoesTributariasIS(edtDataISO.Text);
-    try
-      LogJSON('Situações Tributárias IS', D);
-    finally
-      D.Free;
-    end;
+    LListaSitTribIS := fpCalculadora.ConsultarSituacoesTributariasIS(edtDataBase.Text);
+    MemoResp.Lines.Clear;
+    MemoResp.Lines.Add(Format('Total de Situações Tributárias IS: %d',[LListaSitTribIS.Count]));
+    if LListaSitTribIS.Count > 0 then
+      MemoResp.Lines.Add(LListaSitTribIS.Items[0].Descricao);
   except
     on E: Exception do LogError(E);
   end;
@@ -566,16 +554,15 @@ end;
 
 procedure TFormCalcDemo.btnSTCBSIBSClick(Sender: TObject);
 var
-  D: TJSONData;
+  LListaSitTribCBSIBS: TListaSituacaoTributaria;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarSituacoesTributariasCbsIbs(edtDataISO.Text);
-    try
-      LogJSON('Situações Tributárias CBS/IBS', D);
-    finally
-      D.Free;
-    end;
+    LListaSitTribCBSIBS := fpCalculadora.ConsultarSituacoesTributariasCbsIbs(edtDataBase.Text);
+    MemoResp.Lines.Clear;
+    MemoResp.Lines.Add(Format('Total de Situações Tributárias CBS/IBS: %d',[LListaSitTribCBSIBS.Count]));
+    if LListaSitTribCBSIBS.Count > 0 then
+      MemoResp.Lines.Add(LListaSitTribCBSIBS.Items[0].Descricao);
   except
     on E: Exception do LogError(E);
   end;
@@ -583,16 +570,13 @@ end;
 
 procedure TFormCalcDemo.btnNCMClick(Sender: TObject);
 var
-  D: TJSONData;
+  LNCM: INcmOutput;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarNcm(edtNcmQuery.Text, edtDataISO.Text);
-    try
-      LogJSON('NCM', D);
-    finally
-      D.Free;
-    end;
+    LNCM := fpCalculadora.ConsultarNcm(edtNcmQuery.Text, edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(LNCM.Capitulo);
   except
     on E: Exception do LogError(E);
   end;
@@ -600,16 +584,13 @@ end;
 
 procedure TFormCalcDemo.btnNBSClick(Sender: TObject);
 var
-  D: TJSONData;
+  LNbs: INbsOutput;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarNbs(edtNbsQuery.Text, edtDataISO.Text);
-    try
-      LogJSON('NBS', D);
-    finally
-      D.Free;
-    end;
+    LNbs := fpCalculadora.ConsultarNbs(edtNbsQuery.Text, edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(LNbs.Item);
   except
     on E: Exception do LogError(E);
   end;
@@ -617,16 +598,13 @@ end;
 
 procedure TFormCalcDemo.btnFundamentacoesClick(Sender: TObject);
 var
-  D: TJSONData;
+  LFundClass: TListaFundClass;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarFundamentacoesLegais(edtDataISO.Text);
-    try
-      LogJSON('Fundamentações Legais', D);
-    finally
-      D.Free;
-    end;
+    LFundClass := fpCalculadora.ConsultarFundamentacoesLegais(edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(LFundClass.Items[0].DescricaoClassificacaoTributaria);
   except
     on E: Exception do LogError(E);
   end;
@@ -634,16 +612,15 @@ end;
 
 procedure TFormCalcDemo.btnClassTribPorIdClick(Sender: TObject);
 var
-  D: TJSONData;
+  LClassTrib: TListaClassTrib;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarClassificacoesTributariasPorId(StrToInt64Safe(edtIdClassTrib.Text), edtDataISO.Text);
-    try
-      LogJSON('Classificação Tributária por Id', D);
-    finally
-      D.Free;
-    end;
+    LClassTrib := fpCalculadora.ConsultarClassificacoesTributariasPorId(StrToInt64Safe(edtIdClassTrib.Text), edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(Format('Total de Situações Tributárias por Id: %d',[LClassTrib.Count]));
+    if LClassTrib.Count > 0 then
+      MemoResp.Lines.Add(LClassTrib.Items[0].DescricaoTratamentoTributario);
   except
     on E: Exception do LogError(E);
   end;
@@ -651,16 +628,16 @@ end;
 
 procedure TFormCalcDemo.btnClassTribISClick(Sender: TObject);
 var
-  D: TJSONData;
+  LClassTribIS: TListaClassTrib;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarClassificacoesTributariasIS(edtDataISO.Text);
-    try
-      LogJSON('Classificações Tributárias IS', D);
-    finally
-      D.Free;
-    end;
+    LClassTribIS := fpCalculadora.ConsultarClassificacoesTributariasIS(edtDataBase.Text);
+    MemoResp.Clear;
+    if LClassTribIS.Count > 0 then
+      MemoResp.Lines.Add(LClassTribIS.Items[0].Descricao)
+    else
+      MemoResp.Lines.Add('Lista Vazia');
   except
     on E: Exception do LogError(E);
   end;
@@ -668,16 +645,13 @@ end;
 
 procedure TFormCalcDemo.btnClassTribCBSIBSClick(Sender: TObject);
 var
-  D: TJSONData;
+  LClassTribCBSIBS: TListaClassTrib;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarClassificacoesTributariasCbsIbs(edtDataISO.Text);
-    try
-      LogJSON('Classificações Tributárias CBS/IBS', D);
-    finally
-      D.Free;
-    end;
+    LClassTribCBSIBS := fpCalculadora.ConsultarClassificacoesTributariasCbsIbs(edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(LClassTribCBSIBS.Items[0].Descricao);
   except
     on E: Exception do LogError(E);
   end;
@@ -685,16 +659,13 @@ end;
 
 procedure TFormCalcDemo.btnAliqUniaoClick(Sender: TObject);
 var
-  D: TJSONData;
+  LAliqUniao: IAliquotaOutput;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarAliquotaUniao(edtDataISO.Text);
-    try
-      LogJSON('Alíquota União', D);
-    finally
-      D.Free;
-    end;
+    LAliqUniao := fpCalculadora.ConsultarAliquotaUniao(edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(FloatToStr(LAliqUniao.AliquotaReferencia));
   except
     on E: Exception do LogError(E);
   end;
@@ -702,16 +673,13 @@ end;
 
 procedure TFormCalcDemo.btnAliqUFClick(Sender: TObject);
 var
-  D: TJSONData;
+  LAliqUF: IAliquotaOutput;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarAliquotaUf(StrToInt64Safe(edtCodigoUF.Text), edtDataISO.Text);
-    try
-      LogJSON('Alíquota UF', D);
-    finally
-      D.Free;
-    end;
+    LAliqUF := fpCalculadora.ConsultarAliquotaUf(StrToInt64Safe(edtCodigoUF.Text), edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(FloatToStr(LAliqUF.AliquotaReferencia));
   except
     on E: Exception do LogError(E);
   end;
@@ -719,16 +687,13 @@ end;
 
 procedure TFormCalcDemo.btnAliqMunicipioClick(Sender: TObject);
 var
-  D: TJSONData;
+  LAliqMun: IAliquotaOutput;
 begin
   ApplyConfig;
   try
-    D := fpCalculadora.ConsultarAliquotaMunicipio(StrToInt64Safe(edtCodigoMunicipio.Text), edtDataISO.Text);
-    try
-      LogJSON('Alíquota Município', D);
-    finally
-      D.Free;
-    end;
+    LAliqMun := fpCalculadora.ConsultarAliquotaMunicipio(StrToInt64Safe(edtCodigoMunicipio.Text), edtDataBase.Text);
+    MemoResp.Clear;
+    MemoResp.Lines.Add(FloatToStr(LAliqMun.AliquotaReferencia));
   except
     on E: Exception do LogError(E);
   end;

@@ -385,7 +385,7 @@ object FormCalcDemo: TFormCalcDemo
       Width = 22
       Caption = 'NBS'
     end
-    object edtDataISO: TEdit
+    object edtDataBase: TEdit
       Left = 70
       Height = 23
       Top = 20
@@ -569,7 +569,7 @@ object FormCalcDemo: TFormCalcDemo
       TabOrder = 21
       OnClick = btnPedagioClick
     end
-    object MemoROC: TMemo
+    object MemoResp: TMemo
       Left = 8
       Height = 135
       Top = 194

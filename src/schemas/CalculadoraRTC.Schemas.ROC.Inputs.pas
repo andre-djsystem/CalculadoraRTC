@@ -10,8 +10,6 @@ uses
   CalculadoraRTC.Utils.DateTime;
 
 type
-  {===================== Interfaces (Fluent) =====================}
-
   ITributacaoRegularInput = interface
     ['{A7D7C5D4-7F7E-4B8E-9F84-4A5F8D6F9E10}']
     function CST(const AValue: string): ITributacaoRegularInput;
@@ -63,8 +61,6 @@ type
 
     function ToJSON: TJSONObject;
   end;
-
-  {===================== Implementações =====================}
 
   TTributacaoRegularInput = class(TInterfacedObject, ITributacaoRegularInput)
   private
@@ -160,8 +156,6 @@ type
 
 implementation
 
-{===================== TTributacaoRegularInput =====================}
-
 class function TTributacaoRegularInput.New: ITributacaoRegularInput;
 begin
   Result := TTributacaoRegularInput.Create;
@@ -185,8 +179,6 @@ begin
   Result.Add('cst', fpCST);
   Result.Add('cClassTrib', fpCClassTrib);
 end;
-
-{===================== TImpostoSeletivoInput =====================}
 
 class function TImpostoSeletivoInput.New: IImpostoSeletivoInput;
 begin
@@ -239,8 +231,6 @@ begin
   Result.Add('impostoInformado', JFloat(fpImpostoInformado));
   Result.Add('cClassTrib', fpCClassTrib);
 end;
-
-{===================== TItemOperacaoInput =====================}
 
 constructor TItemOperacaoInput.Create(const AParent: IOperacaoInput);
 begin
@@ -342,8 +332,6 @@ begin
     Result.Add('tributacaoRegular', fpTributacaoRegular.ToJSON);
   Result.Add('cClassTrib', fpCClassTrib);
 end;
-
-{===================== TOperacaoInput =====================}
 
 class function TOperacaoInput.New: IOperacaoInput;
 begin

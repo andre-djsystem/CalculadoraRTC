@@ -15,12 +15,16 @@ uses
   CalculadoraRTC.Utils.Logging,
   CalculadoraRTC.Schemas.ROC.Core,
   CalculadoraRTC.Schemas.ROC.Inputs,
-  CalculadoraRTC.Schemas.Pedagio;
+  CalculadoraRTC.Schemas.Pedagio,
+  CalculadoraRTC.Schemas.DadosAbertos;
 
 type
   ECalculadoraRTC = class(Exception);
 
   { Interface com reference counting para facilitar o gerenciamento de memória }
+
+  { ICalculadoraRTC }
+
   ICalculadoraRTC = interface(IInterface)
     ['{5B3C2C3E-486B-4F7D-9E5E-0A2C9C6E0F12}']
 
@@ -44,20 +48,34 @@ type
     function GerarXml(const ARocJson: TJSONObject): string;
 
     // Dados abertos
-    function ConsultarVersao: TJSONData;
-    function ConsultarUfs: TJSONData;
-    function ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TJSONData;
-    function ConsultarSituacoesTributariasIS(const ADataISO: string): TJSONData;
-    function ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
-    function ConsultarNcm(const ANcm: string; const ADataISO: string): TJSONData;
-    function ConsultarNbs(const ANbs: string; const ADataISO: string): TJSONData;
-    function ConsultarFundamentacoesLegais(const ADataISO: string): TJSONData;
-    function ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TJSONData;
-    function ConsultarClassificacoesTributariasIS(const ADataISO: string): TJSONData;
-    function ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
-    function ConsultarAliquotaUniao(const ADataISO: string): TJSONData;
-    function ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
-    function ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
+    function ConsultarVersaoJSON: TJSONData;
+    function ConsultarVersao: IVersaoOutput;
+    function ConsultarUfsJSON: TJSONData;
+    function ConsultarUfs: TListaUF;
+    function ConsultarMunicipiosPorSiglaUfJSON(const ASiglaUf: string): TJSONData;
+    function ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TListaMunicipio;
+    function ConsultarSituacoesTributariasISJSON(const ADataISO: string): TJSONData;
+    function ConsultarSituacoesTributariasIS(const ADataISO: string): TListaSituacaoTributaria;
+    function ConsultarSituacoesTributariasCbsIbsJSON(const ADataISO: string): TJSONData;
+    function ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TListaSituacaoTributaria;
+    function ConsultarNcmJSON(const ANcm: string; const ADataISO: string): TJSONData;
+    function ConsultarNcm(const ANcm: string; const ADataISO: string): INcmOutput;
+    function ConsultarNbsJSON(const ANbs: string; const ADataISO: string): TJSONData;
+    function ConsultarNbs(const ANbs: string; const ADataISO: string): INbsOutput;
+    function ConsultarFundamentacoesLegaisJSON(const ADataISO: string): TJSONData;
+    function ConsultarFundamentacoesLegais(const ADataISO: string): TListaFundClass;
+    function ConsultarClassificacoesTributariasPorIdJSON(const AId: Int64; const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TListaClassTrib;
+    function ConsultarClassificacoesTributariasISJSON(const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasIS(const ADataISO: string): TListaClassTrib;
+    function ConsultarClassificacoesTributariasCbsIbsJSON(const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TListaClassTrib;
+    function ConsultarAliquotaUniaoJSON(const ADataISO: string): TJSONData;
+    function ConsultarAliquotaUniao(const ADataISO: string): IAliquotaOutput;
+    function ConsultarAliquotaUfJSON(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
+    function ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): IAliquotaOutput;
+    function ConsultarAliquotaMunicipioJSON(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
+    function ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): IAliquotaOutput;
 
     // Propriedades de somente-leitura (expostas por getters)
     function GetLastAppVersion: string;
@@ -133,20 +151,34 @@ type
     function GerarXml(const ARocJson: TJSONObject): string;
 
     // ICalculadoraRTC (dados abertos)
-    function ConsultarVersao: TJSONData;
-    function ConsultarUfs: TJSONData;
-    function ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TJSONData;
-    function ConsultarSituacoesTributariasIS(const ADataISO: string): TJSONData;
-    function ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
-    function ConsultarNcm(const ANcm: string; const ADataISO: string): TJSONData;
-    function ConsultarNbs(const ANbs: string; const ADataISO: string): TJSONData;
-    function ConsultarFundamentacoesLegais(const ADataISO: string): TJSONData;
-    function ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TJSONData;
-    function ConsultarClassificacoesTributariasIS(const ADataISO: string): TJSONData;
-    function ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
-    function ConsultarAliquotaUniao(const ADataISO: string): TJSONData;
-    function ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
-    function ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
+    function ConsultarVersaoJSON: TJSONData;
+    function ConsultarVersao: IVersaoOutput;
+    function ConsultarUfsJSON: TJSONData;
+    function ConsultarUfs: TListaUF;
+    function ConsultarMunicipiosPorSiglaUfJSON(const ASiglaUf: string): TJSONData;
+    function ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TListaMunicipio;
+    function ConsultarSituacoesTributariasISJSON(const ADataISO: string): TJSONData;
+    function ConsultarSituacoesTributariasIS(const ADataISO: string): TListaSituacaoTributaria;
+    function ConsultarSituacoesTributariasCbsIbsJSON(const ADataISO: string): TJSONData;
+    function ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TListaSituacaoTributaria;
+    function ConsultarNcmJSON(const ANcm: string; const ADataISO: string): TJSONData;
+    function ConsultarNcm(const ANcm: string; const ADataISO: string): INcmOutput;
+    function ConsultarNbsJSON(const ANbs: string; const ADataISO: string): TJSONData;
+    function ConsultarNbs(const ANbs: string; const ADataISO: string): INbsOutput;
+    function ConsultarFundamentacoesLegaisJSON(const ADataISO: string): TJSONData;
+    function ConsultarFundamentacoesLegais(const ADataISO: string): TListaFundClass;
+    function ConsultarClassificacoesTributariasPorIdJSON(const AId: Int64; const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TListaClassTrib;
+    function ConsultarClassificacoesTributariasISJSON(const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasIS(const ADataISO: string): TListaClassTrib;
+    function ConsultarClassificacoesTributariasCbsIbsJSON(const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TListaClassTrib;
+    function ConsultarAliquotaUniaoJSON(const ADataISO: string): TJSONData;
+    function ConsultarAliquotaUniao(const ADataISO: string): IAliquotaOutput;
+    function ConsultarAliquotaUfJSON(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
+    function ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): IAliquotaOutput;
+    function ConsultarAliquotaMunicipioJSON(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
+    function ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): IAliquotaOutput;
   end;
 
 implementation
@@ -516,77 +548,169 @@ begin
   end;
 end;
 
-{=== Dados Abertos ===}
-
-function TCalculadoraRTCCalculadora.ConsultarVersao: TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarVersaoJSON: TJSONData;
 begin
   Result := DoGetJSON('versao');
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarUfs: TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarVersao: IVersaoOutput;
+begin
+  Result := TVersaoOutput.FromJSON(ConsultarVersaoJSON);
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarUfsJSON: TJSONData;
 begin
   Result := DoGetJSON('ufs');
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarUfs: TListaUF;
+begin
+  Result := ParseListaUF(ConsultarUfsJSON);
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarMunicipiosPorSiglaUfJSON(
+  const ASiglaUf: string): TJSONData;
 begin
   Result := DoGetJSON('ufs/municipios?siglaUf=' + EncodeURLElement(ASiglaUf));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasIS(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarMunicipiosPorSiglaUf(
+  const ASiglaUf: string): TListaMunicipio;
+begin
+  Result := ParseListaMunicipio(ConsultarMunicipiosPorSiglaUfJSON(ASiglaUf));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasISJSON(
+  const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('situacoes-tributarias/imposto-seletivo?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasIS(
+  const ADataISO: string): TListaSituacaoTributaria;
+begin
+  Result := ParseListaSituacaoTributaria(ConsultarSituacoesTributariasISJSON(ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasCbsIbsJSON(
+  const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('situacoes-tributarias/cbs-ibs?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarNcm(const ANcm: string; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasCbsIbs(
+  const ADataISO: string): TListaSituacaoTributaria;
+begin
+  Result := ParseListaSituacaoTributaria(ConsultarSituacoesTributariasCbsIbsJSON(ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarNcmJSON(const ANcm: string;
+  const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('ncm?ncm=%s&data=%s', [EncodeURLElement(ANcm), EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarNbs(const ANbs: string; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarNcm(const ANcm: string;
+  const ADataISO: string): INcmOutput;
+begin
+  Result := TNcmOutput.FromJSON(ConsultarNcmJSON(ANcm, ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarNbsJSON(const ANbs: string;
+  const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('nbs?nbs=%s&data=%s', [EncodeURLElement(ANbs), EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarFundamentacoesLegais(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarNbs(const ANbs: string;
+  const ADataISO: string): INbsOutput;
+begin
+  Result := TNbsOutput.FromJSON(ConsultarNbsJSON(ANbs, ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarFundamentacoesLegaisJSON(
+  const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('fundamentacoes-legais?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarFundamentacoesLegais(
+  const ADataISO: string): TListaFundClass;
+begin
+  Result := ParseListaFundClass(ConsultarFundamentacoesLegaisJSON(ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasPorIdJSON(
+  const AId: Int64; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('classificacoes-tributarias/%d?data=%s', [AId, EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasIS(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasPorId(
+  const AId: Int64; const ADataISO: string): TListaClassTrib;
+begin
+   Result := ParseListaClassificacaoTributaria(ConsultarClassificacoesTributariasPorIdJSON(AId, ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasISJSON(
+  const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('classificacoes-tributarias/imposto-seletivo?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasIS(
+  const ADataISO: string): TListaClassTrib;
+begin
+  Result := ParseListaClassificacaoTributaria(ConsultarClassificacoesTributariasISJSON(ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasCbsIbsJSON
+  (const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('classificacoes-tributarias/cbs-ibs?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarAliquotaUniao(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasCbsIbs(
+  const ADataISO: string): TListaClassTrib;
+begin
+  Result := ParseListaClassificacaoTributaria(ConsultarClassificacoesTributariasCbsIbsJSON(ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarAliquotaUniaoJSON(
+  const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('aliquota-uniao?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarAliquotaUniao(
+  const ADataISO: string): IAliquotaOutput;
+begin
+  Result := TAliquotaOutput.FromJSON(ConsultarAliquotaUniaoJSON(ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarAliquotaUfJSON(
+  const ACodigoUf: Int64; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('aliquota-uf?codigoUf=%d&data=%s', [ACodigoUf, EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCCalculadora.ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarAliquotaUf(const ACodigoUf: Int64;
+  const ADataISO: string): IAliquotaOutput;
+begin
+  Result := TAliquotaOutput.FromJSON(ConsultarAliquotaUfJSON(ACodigoUf, ADataISO));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarAliquotaMunicipioJSON(
+  const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('aliquota-municipio?codigoMunicipio=%d&data=%s',
     [ACodigoMunicipio, EncodeURLElement(ADataISO)]));
+end;
+
+function TCalculadoraRTCCalculadora.ConsultarAliquotaMunicipio(
+  const ACodigoMunicipio: Int64; const ADataISO: string): IAliquotaOutput;
+begin
+  Result := TAliquotaOutput.FromJSON(ConsultarAliquotaMunicipioJSON(ACodigoMunicipio, ADataISO));
 end;
 
 end.

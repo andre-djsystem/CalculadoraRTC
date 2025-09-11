@@ -55,7 +55,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\src;..\..\src\client;..\..\src\config;..\..\src\core;..\..\src\schemas;..\..\src\utils;..\..\modules\restrequest4delphi\src"/>
+      <OtherUnitFiles Value="..\..\src;..\..\src\calculadora;..\..\src\config;..\..\src\core;..\..\src\schemas;..\..\src\utils;..\..\modules\restrequest4delphi\src"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

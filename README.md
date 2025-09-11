@@ -15,7 +15,7 @@ boss install https://github.com/andre-djsystem/CalculadoraRTC
 ### Instalação Manual
 Caso queira instalar manualmente, adicione os paths abaixo nas configurações do projeto, em *Project > Project Options > Paths > Other unit files (-Fu) > Include file search path*
 ```
-../CalculadoraRTC/src/client
+../CalculadoraRTC/src/calculadora
 ../CalculadoraRTC/src/config
 ../CalculadoraRTC/src/core
 ../CalculadoraRTC/src/schemas

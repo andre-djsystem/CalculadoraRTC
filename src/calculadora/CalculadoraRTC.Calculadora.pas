@@ -1,6 +1,7 @@
-unit CalculadoraRTC.Client;
+unit CalculadoraRTC.Calculadora;
 
 {$mode objfpc}{$H+}
+{$interfaces COM}  // habilita interfaces COM (com referência/contagem e liberação automática)
 
 interface
 
@@ -19,9 +20,65 @@ uses
 type
   ECalculadoraRTC = class(Exception);
 
-  { TCalculadoraRTCClient }
+  { Interface com reference counting para facilitar o gerenciamento de memória }
+  ICalculadoraRTC = interface(IInterface)
+    ['{5B3C2C3E-486B-4F7D-9E5E-0A2C9C6E0F12}']
 
-  TCalculadoraRTCClient = class
+    // Builders (fluentes)
+    function BaseUrl(const AValue: string): ICalculadoraRTC;
+    function Timeout(const AMS: Integer): ICalculadoraRTC;
+    function UserAgent(const AValue: string): ICalculadoraRTC;
+    function Logger(const ALogger: ICalcLogger): ICalculadoraRTC;
+
+    // Endpoints principais
+    function CalcularRegimeGeralJSON(const AOperacao: IOperacaoInput): TJSONData;
+    function CalcularRegimeGeral(const AOperacao: IOperacaoInput): IROC;
+
+    function CalcularISMercadorias(const AInputJson: TJSONObject): TJSONData;
+    function CalcularCibs(const AInputJson: TJSONObject): TJSONData;
+
+    function CalcularPedagioJSON(const AInputJson: TJSONObject): TJSONData;
+    function CalcularPedagio(const AInputJson: TJSONObject): ITributoPedagioOutput;
+
+    function ValidarXml(const ATipo: string; const ASubtipo: string; const AXml: string): Boolean;
+    function GerarXml(const ARocJson: TJSONObject): string;
+
+    // Dados abertos
+    function ConsultarVersao: TJSONData;
+    function ConsultarUfs: TJSONData;
+    function ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TJSONData;
+    function ConsultarSituacoesTributariasIS(const ADataISO: string): TJSONData;
+    function ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
+    function ConsultarNcm(const ANcm: string; const ADataISO: string): TJSONData;
+    function ConsultarNbs(const ANbs: string; const ADataISO: string): TJSONData;
+    function ConsultarFundamentacoesLegais(const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasIS(const ADataISO: string): TJSONData;
+    function ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
+    function ConsultarAliquotaUniao(const ADataISO: string): TJSONData;
+    function ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
+    function ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
+
+    // Propriedades de somente-leitura (expostas por getters)
+    function GetLastAppVersion: string;
+    function GetLastDbVersion: string;
+    function GetLastStatus: Integer;
+    function GetLastResponseText: string;
+    function GetLastResponseJSON: TJSONData;
+    function GetLastResponseXML: string;
+
+    property LastAppVersion: string read GetLastAppVersion;
+    property LastDbVersion: string read GetLastDbVersion;
+    property LastStatus: Integer read GetLastStatus;
+
+    property LastResponseText: string read GetLastResponseText;
+    property LastResponseJSON: TJSONData read GetLastResponseJSON;
+    property LastResponseXML: string read GetLastResponseXML;
+  end;
+
+  { TCalculadoraRTCCalculadora }
+
+  TCalculadoraRTCCalculadora = class(TInterfacedObject, ICalculadoraRTC)
   private
     fpBaseUrl: string;
     fpTimeout: Integer;
@@ -44,15 +101,25 @@ type
     function DoPostJSON(const APath: string; const ABody: TJSONObject): TJSONData;
     function DoGetJSON(const ARelPathAndQuery: string): TJSONData;
 
+    // Getters para propriedades da interface
+    function GetLastAppVersion: string;
+    function GetLastDbVersion: string;
+    function GetLastStatus: Integer;
+    function GetLastResponseText: string;
+    function GetLastResponseJSON: TJSONData;
+    function GetLastResponseXML: string;
+
   public
-    class function New: TCalculadoraRTCClient; static;
+    class function New: ICalculadoraRTC; static;
     destructor Destroy; override;
 
-    function BaseUrl(const AValue: string): TCalculadoraRTCClient;
-    function Timeout(const AMS: Integer): TCalculadoraRTCClient;
-    function UserAgent(const AValue: string): TCalculadoraRTCClient;
-    function Logger(const ALogger: ICalcLogger): TCalculadoraRTCClient;
+    // ICalculadoraRTC (builders)
+    function BaseUrl(const AValue: string): ICalculadoraRTC;
+    function Timeout(const AMS: Integer): ICalculadoraRTC;
+    function UserAgent(const AValue: string): ICalculadoraRTC;
+    function Logger(const ALogger: ICalcLogger): ICalculadoraRTC;
 
+    // ICalculadoraRTC (endpoints)
     function CalcularRegimeGeralJSON(const AOperacao: IOperacaoInput): TJSONData;
     function CalcularRegimeGeral(const AOperacao: IOperacaoInput): IROC;
 
@@ -65,6 +132,7 @@ type
     function ValidarXml(const ATipo: string; const ASubtipo: string; const AXml: string): Boolean;
     function GerarXml(const ARocJson: TJSONObject): string;
 
+    // ICalculadoraRTC (dados abertos)
     function ConsultarVersao: TJSONData;
     function ConsultarUfs: TJSONData;
     function ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TJSONData;
@@ -79,97 +147,117 @@ type
     function ConsultarAliquotaUniao(const ADataISO: string): TJSONData;
     function ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
     function ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
-
-    property LastAppVersion: string read fpLastAppVersion;
-    property LastDbVersion: string read fpLastDbVersion;
-    property LastStatus: Integer read fpLastStatus;
-
-    property LastResponseText: string read fpLastResponseText;
-    property LastResponseJSON: TJSONData read fpLastResponseJSON;
-    property LastResponseXML: string read fpLastResponseXML;
   end;
 
 implementation
 
-{ TCalculadoraRTCClient }
+{ TCalculadoraRTCCalculadora }
 
-class function TCalculadoraRTCClient.New: TCalculadoraRTCClient;
+class function TCalculadoraRTCCalculadora.New: ICalculadoraRTC;
+var
+  Obj: TCalculadoraRTCCalculadora;
 begin
-  Result := TCalculadoraRTCClient.Create;
-  Result.fpBaseUrl := 'https://piloto-cbs.tributos.gov.br/servico/calculadora-consumo/api';
-  Result.fpTimeout := 30000;
-  Result.fpUserAgent := 'CalculadoraRTC/Lazarus-Client 1.0';
+  Obj := TCalculadoraRTCCalculadora.Create;
+  Obj.fpBaseUrl := 'https://piloto-cbs.tributos.gov.br/servico/calculadora-consumo/api';
+  Obj.fpTimeout := 30000;
+  Obj.fpUserAgent := 'CalculadoraRTC/DJSystem';
+  Result := Obj; // retorna como interface (com ref counting)
 end;
 
-destructor TCalculadoraRTCClient.Destroy;
+destructor TCalculadoraRTCCalculadora.Destroy;
 begin
   if Assigned(fpLastResponseJSON) then
-  begin
     fpLastResponseJSON.Free;
-  end;
   inherited Destroy;
 end;
 
-function TCalculadoraRTCClient.BaseUrl(const AValue: string): TCalculadoraRTCClient;
+{ Getters (propriedades da interface) }
+
+function TCalculadoraRTCCalculadora.GetLastAppVersion: string;
+begin
+  Result := fpLastAppVersion;
+end;
+
+function TCalculadoraRTCCalculadora.GetLastDbVersion: string;
+begin
+  Result := fpLastDbVersion;
+end;
+
+function TCalculadoraRTCCalculadora.GetLastStatus: Integer;
+begin
+  Result := fpLastStatus;
+end;
+
+function TCalculadoraRTCCalculadora.GetLastResponseText: string;
+begin
+  Result := fpLastResponseText;
+end;
+
+function TCalculadoraRTCCalculadora.GetLastResponseJSON: TJSONData;
+begin
+  Result := fpLastResponseJSON;
+end;
+
+function TCalculadoraRTCCalculadora.GetLastResponseXML: string;
+begin
+  Result := fpLastResponseXML;
+end;
+
+{ Builders }
+
+function TCalculadoraRTCCalculadora.BaseUrl(const AValue: string): ICalculadoraRTC;
 begin
   fpBaseUrl := AValue;
   if (fpBaseUrl <> '') and (fpBaseUrl[Length(fpBaseUrl)] = '/') then
-  begin
     Delete(fpBaseUrl, Length(fpBaseUrl), 1);
-  end;
   Result := Self;
 end;
 
-function TCalculadoraRTCClient.Timeout(const AMS: Integer): TCalculadoraRTCClient;
+function TCalculadoraRTCCalculadora.Timeout(const AMS: Integer): ICalculadoraRTC;
 begin
   fpTimeout := AMS;
   Result := Self;
 end;
 
-function TCalculadoraRTCClient.UserAgent(const AValue: string): TCalculadoraRTCClient;
+function TCalculadoraRTCCalculadora.UserAgent(const AValue: string): ICalculadoraRTC;
 begin
   fpUserAgent := AValue;
   Result := Self;
 end;
 
-function TCalculadoraRTCClient.Logger(const ALogger: ICalcLogger): TCalculadoraRTCClient;
+function TCalculadoraRTCCalculadora.Logger(const ALogger: ICalcLogger): ICalculadoraRTC;
 begin
   fpLogger := ALogger;
   Result := Self;
 end;
 
-function TCalculadoraRTCClient.BuildUrl(const APath: string): string;
+{ Infra }
+
+function TCalculadoraRTCCalculadora.BuildUrl(const APath: string): string;
 begin
   if (Length(APath) > 0) and (APath[1] = '/') then
-  begin
-    Result := fpBaseUrl + APath;
-  end
+    Result := fpBaseUrl + APath
   else
-  begin
     Result := fpBaseUrl + '/' + APath;
-  end;
 end;
 
-procedure TCalculadoraRTCClient.ClearLastResponse;
+procedure TCalculadoraRTCCalculadora.ClearLastResponse;
 begin
   fpLastResponseText := '';
   fpLastResponseXML := '';
   fpLastStatus := 0;
-
   if Assigned(fpLastResponseJSON) then
-  begin
     FreeAndNil(fpLastResponseJSON);
-  end;
 end;
 
-function TCalculadoraRTCClient.ParseJsonText(const AText: string): TJSONData;
+function TCalculadoraRTCCalculadora.ParseJsonText(const AText: string): TJSONData;
 begin
   // Usa GetJSONExt para substituir TJSONFloatNumber -> TJSONExtFloatNumber
   // e garantir saída sem notação científica no FormatJSON.
   Result := GetJSONExt(AText, True);
 end;
 
-function TCalculadoraRTCClient.DoPostJSON(const APath: string;
+function TCalculadoraRTCCalculadora.DoPostJSON(const APath: string;
   const ABody: TJSONObject): TJSONData;
 var
   LResponse: IResponse;
@@ -219,30 +307,22 @@ begin
       try
         LErr := ParseJsonText(fpLastResponseText);
         if (LErr <> nil) and (LErr.JSONType = jtObject) then
-        begin
           LDetail := TJSONObject(LErr).Get('detail', '');
-        end;
       except
         // mantém LDetail vazio
       end;
 
       if LDetail <> '' then
-      begin
-        raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [fpLastStatus, LDetail]);
-      end
+        raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [fpLastStatus, LDetail])
       else
-      begin
         raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [fpLastStatus, fpLastResponseText]);
-      end;
     end;
 
     if Trim(fpLastResponseText) <> '' then
     begin
       fpLastResponseJSON := ParseJsonText(fpLastResponseText);
       if Assigned(fpLogger) then
-      begin
         fpLogger.LogJSON('response', fpLastResponseJSON);
-      end;
       Result := fpLastResponseJSON.Clone;
     end;
   finally
@@ -250,7 +330,7 @@ begin
   end;
 end;
 
-function TCalculadoraRTCClient.DoGetJSON(const ARelPathAndQuery: string): TJSONData;
+function TCalculadoraRTCCalculadora.DoGetJSON(const ARelPathAndQuery: string): TJSONData;
 var
   LResponse: IResponse;
   LUrl: string;
@@ -263,9 +343,7 @@ begin
   LUrl := BuildUrl('calculadora/dados-abertos/' + ARelPathAndQuery);
 
   if Assigned(fpLogger) then
-  begin
     fpLogger.LogText('GET ' + LUrl);
-  end;
 
   LResponse := TRequest.New
     .BaseURL(LUrl)
@@ -288,38 +366,32 @@ begin
   end;
 
   if (LStatus div 100) <> 2 then
-  begin
     raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [LStatus, fpLastResponseText]);
-  end;
 
   if Trim(fpLastResponseText) = '' then
-  begin
     Exit(nil);
-  end;
 
   fpLastResponseJSON := ParseJsonText(fpLastResponseText);
 
   if Assigned(fpLogger) then
-  begin
     fpLogger.LogJSON('response', fpLastResponseJSON);
-  end;
 
   Result := fpLastResponseJSON.Clone;
 end;
 
 {=== Endpoints ===}
 
-function TCalculadoraRTCClient.CalcularRegimeGeralJSON(const AOperacao: IOperacaoInput): TJSONData;
+function TCalculadoraRTCCalculadora.CalcularRegimeGeralJSON(const AOperacao: IOperacaoInput): TJSONData;
 begin
   Result := DoPostJSON('calculadora/regime-geral', AOperacao.ToJSON);
 end;
 
-function TCalculadoraRTCClient.CalcularRegimeGeral(const AOperacao: IOperacaoInput): IROC;
+function TCalculadoraRTCCalculadora.CalcularRegimeGeral(const AOperacao: IOperacaoInput): IROC;
 begin
   Result := TROC.FromJSON(CalcularRegimeGeralJSON(AOperacao));
 end;
 
-function TCalculadoraRTCClient.CalcularISMercadorias(const AInputJson: TJSONObject): TJSONData;
+function TCalculadoraRTCCalculadora.CalcularISMercadorias(const AInputJson: TJSONObject): TJSONData;
 var
   LBody: TJSONObject;
 begin
@@ -332,7 +404,7 @@ begin
   end;
 end;
 
-function TCalculadoraRTCClient.CalcularCibs(const AInputJson: TJSONObject): TJSONData;
+function TCalculadoraRTCCalculadora.CalcularCibs(const AInputJson: TJSONObject): TJSONData;
 var
   LBody: TJSONObject;
 begin
@@ -345,19 +417,17 @@ begin
   end;
 end;
 
-function TCalculadoraRTCClient.CalcularPedagioJSON(const AInputJson: TJSONObject
-  ): TJSONData;
+function TCalculadoraRTCCalculadora.CalcularPedagioJSON(const AInputJson: TJSONObject): TJSONData;
 begin
   Result := DoPostJSON('calculadora/pedagio', AInputJson);
 end;
 
-function TCalculadoraRTCClient.CalcularPedagio(const AInputJson: TJSONObject
-  ): ITributoPedagioOutput;
+function TCalculadoraRTCCalculadora.CalcularPedagio(const AInputJson: TJSONObject): ITributoPedagioOutput;
 begin
   Result := TTributoPedagioOutput.FromJSON(TJSONObject(CalcularPedagioJSON(AInputJson)));
 end;
 
-function TCalculadoraRTCClient.ValidarXml(const ATipo: string; const ASubtipo: string; const AXml: string): Boolean;
+function TCalculadoraRTCCalculadora.ValidarXml(const ATipo: string; const ASubtipo: string; const AXml: string): Boolean;
 var
   LResponse: IResponse;
   LUrl: string;
@@ -370,9 +440,7 @@ begin
     [EncodeURLElement(ATipo), EncodeURLElement(ASubtipo)]));
 
   if Assigned(fpLogger) then
-  begin
     fpLogger.LogText('POST ' + LUrl);
-  end;
 
   LResponse := TRequest.New
     .BaseURL(LUrl)
@@ -385,7 +453,6 @@ begin
 
   LStatus := LResponse.StatusCode;
   fpLastStatus := LStatus;
-
   fpLastResponseText := LResponse.Content;
 
   if Assigned(fpLogger) then
@@ -395,15 +462,13 @@ begin
   end;
 
   if (LStatus div 100) <> 2 then
-  begin
     raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [LStatus, fpLastResponseText]);
-  end;
 
   LStr := Trim(fpLastResponseText);
   Result := SameText(LStr, 'true');
 end;
 
-function TCalculadoraRTCClient.GerarXml(const ARocJson: TJSONObject): string;
+function TCalculadoraRTCCalculadora.GerarXml(const ARocJson: TJSONObject): string;
 var
   LResponse: IResponse;
   LUrl: string;
@@ -443,9 +508,7 @@ begin
     end;
 
     if (LStatus div 100) <> 2 then
-    begin
       raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [LStatus, fpLastResponseText]);
-    end;
 
     Result := fpLastResponseXML;
   finally
@@ -455,75 +518,76 @@ end;
 
 {=== Dados Abertos ===}
 
-function TCalculadoraRTCClient.ConsultarVersao: TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarVersao: TJSONData;
 begin
   Result := DoGetJSON('versao');
 end;
 
-function TCalculadoraRTCClient.ConsultarUfs: TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarUfs: TJSONData;
 begin
   Result := DoGetJSON('ufs');
 end;
 
-function TCalculadoraRTCClient.ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarMunicipiosPorSiglaUf(const ASiglaUf: string): TJSONData;
 begin
   Result := DoGetJSON('ufs/municipios?siglaUf=' + EncodeURLElement(ASiglaUf));
 end;
 
-function TCalculadoraRTCClient.ConsultarSituacoesTributariasIS(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasIS(const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('situacoes-tributarias/imposto-seletivo?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCClient.ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarSituacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('situacoes-tributarias/cbs-ibs?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCClient.ConsultarNcm(const ANcm: string; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarNcm(const ANcm: string; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('ncm?ncm=%s&data=%s', [EncodeURLElement(ANcm), EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCClient.ConsultarNbs(const ANbs: string; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarNbs(const ANbs: string; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('nbs?nbs=%s&data=%s', [EncodeURLElement(ANbs), EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCClient.ConsultarFundamentacoesLegais(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarFundamentacoesLegais(const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('fundamentacoes-legais?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCClient.ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasPorId(const AId: Int64; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('classificacoes-tributarias/%d?data=%s', [AId, EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCClient.ConsultarClassificacoesTributariasIS(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasIS(const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('classificacoes-tributarias/imposto-seletivo?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCClient.ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarClassificacoesTributariasCbsIbs(const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('classificacoes-tributarias/cbs-ibs?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCClient.ConsultarAliquotaUniao(const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarAliquotaUniao(const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON('aliquota-uniao?data=' + EncodeURLElement(ADataISO));
 end;
 
-function TCalculadoraRTCClient.ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarAliquotaUf(const ACodigoUf: Int64; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('aliquota-uf?codigoUf=%d&data=%s', [ACodigoUf, EncodeURLElement(ADataISO)]));
 end;
 
-function TCalculadoraRTCClient.ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
+function TCalculadoraRTCCalculadora.ConsultarAliquotaMunicipio(const ACodigoMunicipio: Int64; const ADataISO: string): TJSONData;
 begin
   Result := DoGetJSON(Format('aliquota-municipio?codigoMunicipio=%d&data=%s',
     [ACodigoMunicipio, EncodeURLElement(ADataISO)]));
 end;
 
 end.
+

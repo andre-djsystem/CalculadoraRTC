@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
   fpjson,
-  CalculadoraRTC.Client,
+  CalculadoraRTC.Calculadora,
   CalculadoraRTC.Config,
   CalculadoraRTC.Utils.Logging,
   CalculadoraRTC.Utils.Payload,
@@ -144,7 +144,7 @@ type
     procedure AddLog(const S: string);
 
   private
-    fpClient: TCalculadoraRTCClient;
+    fpCalculadora: ICalculadoraRTC;
     fpLogger: ICalcLogger;
 
     procedure LogJSON(const ATitle: string; const AData: TJSONData);
@@ -168,11 +168,11 @@ implementation
 
 procedure TFormCalcDemo.FormCreate(Sender: TObject);
 begin
-  fpClient := TCalculadoraRTCClient.New;
+  fpCalculadora := TCalculadoraRTCCalculadora.New;
 
   fpLogger := TCalcLogger.Create(@AddLog);
 
-  fpClient.Logger(fpLogger);
+  fpCalculadora.Logger(fpLogger);
 
 //  edtBaseUrl.Text := 'https://piloto-cbs.tributos.gov.br/servico/calculadora-consumo/api';
   edtBaseUrl.Text := 'http://[::1]:8080/api';
@@ -208,7 +208,7 @@ end;
 
 procedure TFormCalcDemo.ApplyConfig;
 begin
-  fpClient.BaseUrl(edtBaseUrl.Text)
+  fpCalculadora.BaseUrl(edtBaseUrl.Text)
           .Timeout(StrToIntDef(edtTimeout.Text, 30000))
           .UserAgent(edtUserAgent.Text);
 end;
@@ -286,7 +286,7 @@ begin
       else if edtNBS.Text <> '' then
         LItemOperacaoInput.NBS(edtNBS.Text);
 
-      LResp := fpClient.CalcularRegimeGeralJSON(LOperacaoInput);
+      LResp := fpCalculadora.CalcularRegimeGeralJSON(LOperacaoInput);
       try
         LogJSON('Regime Geral (RAW)', LResp);
       finally
@@ -327,7 +327,7 @@ begin
           NBS(edtNBS.Text);
       end;
 
-      LROC := fpClient.CalcularRegimeGeral(LOperacaoInput);
+      LROC := fpCalculadora.CalcularRegimeGeral(LOperacaoInput);
       MemoROC.Lines.Text := LROC.total.tribCalc.IBSCBSTot.vBCIBSCBS.ToString;
       LogOk('Regime Geral (Tipado)');
   except
@@ -350,7 +350,7 @@ begin
     LJson := LCalcISBaseInput.ToJSON;
     try
       NormalizeISBasePayload(LJson);
-      LResp := fpClient.CalcularISMercadorias(LJson);
+      LResp := fpCalculadora.CalcularISMercadorias(LJson);
       try
         LogJSON('Base de Cálculo (IS – RAW)', LResp);
       finally
@@ -380,7 +380,7 @@ begin
     LJson := LCalcCibsBaseInput.ToJSON;
     try
       NormalizeCibsBasePayload(LJson);
-      LResp := fpClient.CalcularCibs(LJson);
+      LResp := fpCalculadora.CalcularCibs(LJson);
       try
         LogJSON('Base de Cálculo (CBS/IBS – RAW)', LResp);
       finally
@@ -419,7 +419,7 @@ begin
         .UF(edtUF.Text)
         .Extensao(10.0);
 
-      LResp := fpClient.CalcularPedagioJSON(LPedagioInput.ToJSON);
+      LResp := fpCalculadora.CalcularPedagioJSON(LPedagioInput.ToJSON);
       try
         LogJSON('Pedágio (RAW)', LResp);
       finally
@@ -439,7 +439,7 @@ var
 begin
   ApplyConfig;
   try
-    LOk := fpClient.ValidarXml(edtXMLTipo.Text, edtXMLSubtipo.Text, MemoXML.Text);
+    LOk := fpCalculadora.ValidarXml(edtXMLTipo.Text, edtXMLSubtipo.Text, MemoXML.Text);
     LogText('Validar XML', BoolToStr(LOk, True));
   except
     on E: Exception do LogError(E);
@@ -475,9 +475,9 @@ begin
         NBS(edtNBS.Text);
     end;
 
-    LROCJson := fpClient.CalcularRegimeGeralJSON(LInput);
+    LROCJson := fpCalculadora.CalcularRegimeGeralJSON(LInput);
     try
-      LXML := fpClient.GerarXml(TJSONObject(LROCJson.Clone));
+      LXML := fpCalculadora.GerarXml(TJSONObject(LROCJson.Clone));
       MemoXML.Lines.Text := LXML;
       LogOk('Gerar XML');
     finally
@@ -497,7 +497,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarVersao;
+    D := fpCalculadora.ConsultarVersao;
     LVersao := TVersaoOutput.FromJSON(TJSONObject(D));
     try
       LogJSON('Versão', D);
@@ -516,7 +516,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarUfs;
+    D := fpCalculadora.ConsultarUfs;
     try
       LogJSON('UFs', D);
     finally
@@ -534,7 +534,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarMunicipiosPorSiglaUf(edtSiglaUF.Text);
+    D := fpCalculadora.ConsultarMunicipiosPorSiglaUf(edtSiglaUF.Text);
     try
       LListaMun := ParseListaMunicipio(D);
       LogJSON('Municípios por UF', D);
@@ -553,7 +553,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarSituacoesTributariasIS(edtDataISO.Text);
+    D := fpCalculadora.ConsultarSituacoesTributariasIS(edtDataISO.Text);
     try
       LogJSON('Situações Tributárias IS', D);
     finally
@@ -570,7 +570,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarSituacoesTributariasCbsIbs(edtDataISO.Text);
+    D := fpCalculadora.ConsultarSituacoesTributariasCbsIbs(edtDataISO.Text);
     try
       LogJSON('Situações Tributárias CBS/IBS', D);
     finally
@@ -587,7 +587,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarNcm(edtNcmQuery.Text, edtDataISO.Text);
+    D := fpCalculadora.ConsultarNcm(edtNcmQuery.Text, edtDataISO.Text);
     try
       LogJSON('NCM', D);
     finally
@@ -604,7 +604,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarNbs(edtNbsQuery.Text, edtDataISO.Text);
+    D := fpCalculadora.ConsultarNbs(edtNbsQuery.Text, edtDataISO.Text);
     try
       LogJSON('NBS', D);
     finally
@@ -621,7 +621,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarFundamentacoesLegais(edtDataISO.Text);
+    D := fpCalculadora.ConsultarFundamentacoesLegais(edtDataISO.Text);
     try
       LogJSON('Fundamentações Legais', D);
     finally
@@ -638,7 +638,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarClassificacoesTributariasPorId(StrToInt64Safe(edtIdClassTrib.Text), edtDataISO.Text);
+    D := fpCalculadora.ConsultarClassificacoesTributariasPorId(StrToInt64Safe(edtIdClassTrib.Text), edtDataISO.Text);
     try
       LogJSON('Classificação Tributária por Id', D);
     finally
@@ -655,7 +655,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarClassificacoesTributariasIS(edtDataISO.Text);
+    D := fpCalculadora.ConsultarClassificacoesTributariasIS(edtDataISO.Text);
     try
       LogJSON('Classificações Tributárias IS', D);
     finally
@@ -672,7 +672,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarClassificacoesTributariasCbsIbs(edtDataISO.Text);
+    D := fpCalculadora.ConsultarClassificacoesTributariasCbsIbs(edtDataISO.Text);
     try
       LogJSON('Classificações Tributárias CBS/IBS', D);
     finally
@@ -689,7 +689,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarAliquotaUniao(edtDataISO.Text);
+    D := fpCalculadora.ConsultarAliquotaUniao(edtDataISO.Text);
     try
       LogJSON('Alíquota União', D);
     finally
@@ -706,7 +706,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarAliquotaUf(StrToInt64Safe(edtCodigoUF.Text), edtDataISO.Text);
+    D := fpCalculadora.ConsultarAliquotaUf(StrToInt64Safe(edtCodigoUF.Text), edtDataISO.Text);
     try
       LogJSON('Alíquota UF', D);
     finally
@@ -723,7 +723,7 @@ var
 begin
   ApplyConfig;
   try
-    D := fpClient.ConsultarAliquotaMunicipio(StrToInt64Safe(edtCodigoMunicipio.Text), edtDataISO.Text);
+    D := fpCalculadora.ConsultarAliquotaMunicipio(StrToInt64Safe(edtCodigoMunicipio.Text), edtDataISO.Text);
     try
       LogJSON('Alíquota Município', D);
     finally

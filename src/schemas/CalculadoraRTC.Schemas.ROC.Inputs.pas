@@ -5,28 +5,81 @@ unit CalculadoraRTC.Schemas.ROC.Inputs;
 interface
 
 uses
-  Classes, SysUtils,
-  fpjson, jsonparser,
-  fgl,
+  Classes, SysUtils, fpjson,
   CalculadoraRTC.Utils.JSON,
   CalculadoraRTC.Utils.DateTime;
 
 type
-  TTributacaoRegularInput = class
+  {===================== Interfaces (Fluent) =====================}
+
+  ITributacaoRegularInput = interface
+    ['{A7D7C5D4-7F7E-4B8E-9F84-4A5F8D6F9E10}']
+    function CST(const AValue: string): ITributacaoRegularInput;
+    function CClassTrib(const AValue: string): ITributacaoRegularInput;
+    function ToJSON: TJSONObject;
+  end;
+
+  IImpostoSeletivoInput = interface
+    ['{9A9BC44D-47E1-4E3D-AB4B-4C2D140A0F21}']
+    function CST(const AValue: string): IImpostoSeletivoInput;
+    function BaseCalculo(const AValue: Double): IImpostoSeletivoInput;
+    function Quantidade(const AValue: Double): IImpostoSeletivoInput;
+    function Unidade(const AValue: string): IImpostoSeletivoInput;
+    function ImpostoInformado(const AValue: Double): IImpostoSeletivoInput;
+    function CClassTrib(const AValue: string): IImpostoSeletivoInput;
+    function ToJSON: TJSONObject;
+  end;
+
+  IOperacaoInput = interface; // fwd
+
+  IItemOperacaoInput = interface
+    ['{B6E6D0D5-7B8F-42E3-8430-6E1B6E1180B1}']
+    function Numero(const AValue: Integer): IItemOperacaoInput;
+    function NCM(const AValue: string): IItemOperacaoInput;
+    function NBS(const AValue: string): IItemOperacaoInput;
+    function CST(const AValue: string): IItemOperacaoInput;
+    function BaseCalculo(const AValue: Double): IItemOperacaoInput;
+    function Quantidade(const AValue: Double): IItemOperacaoInput;
+    function Unidade(const AValue: string): IItemOperacaoInput;
+    function CClassTrib(const AValue: string): IItemOperacaoInput;
+
+    function ImpostoSeletivo: IImpostoSeletivoInput;        // encadeia
+    function TributacaoRegular: ITributacaoRegularInput;     // encadeia
+    function &End: IOperacaoInput;                           // volta ao pai
+
+    function ToJSON: TJSONObject;
+  end;
+
+  IOperacaoInput = interface
+    ['{C1E4D1E9-EB78-4FF3-9B24-3B3C9B2E1152}']
+    function Id(const AValue: string): IOperacaoInput;
+    function Versao(const AValue: string): IOperacaoInput;
+    function DataHoraEmissaoISO(const AISO: string): IOperacaoInput;
+    function DataHoraEmissao(const AWhen: TDateTime; const ATZOffsetMinutes: Integer = 0): IOperacaoInput;
+    function Municipio(const AValue: Int64): IOperacaoInput;
+    function UF(const AValue: string): IOperacaoInput;
+
+    function AddItem: IItemOperacaoInput;
+
+    function ToJSON: TJSONObject;
+  end;
+
+  {===================== Implementações =====================}
+
+  TTributacaoRegularInput = class(TInterfacedObject, ITributacaoRegularInput)
   private
     fpCST: string;
     fpCClassTrib: string;
   public
-    function CST(const AValue: string): TTributacaoRegularInput;
-    function CClassTrib(const AValue: string): TTributacaoRegularInput;
+    class function New: ITributacaoRegularInput; static;
 
+    { ITributacaoRegularInput }
+    function CST(const AValue: string): ITributacaoRegularInput;
+    function CClassTrib(const AValue: string): ITributacaoRegularInput;
     function ToJSON: TJSONObject;
-
-    property CSTValue: string read fpCST write fpCST;
-    property CClassTribValue: string read fpCClassTrib write fpCClassTrib;
   end;
 
-  TImpostoSeletivoInput = class
+  TImpostoSeletivoInput = class(TInterfacedObject, IImpostoSeletivoInput)
   private
     fpCST: string;
     fpBaseCalculo: Double;
@@ -35,28 +88,21 @@ type
     fpImpostoInformado: Double;
     fpCClassTrib: string;
   public
-    function CST(const AValue: string): TImpostoSeletivoInput;
-    function BaseCalculo(const AValue: Double): TImpostoSeletivoInput;
-    function Quantidade(const AValue: Double): TImpostoSeletivoInput;
-    function Unidade(const AValue: string): TImpostoSeletivoInput;
-    function ImpostoInformado(const AValue: Double): TImpostoSeletivoInput;
-    function CClassTrib(const AValue: string): TImpostoSeletivoInput;
+    class function New: IImpostoSeletivoInput; static;
 
+    { IImpostoSeletivoInput }
+    function CST(const AValue: string): IImpostoSeletivoInput;
+    function BaseCalculo(const AValue: Double): IImpostoSeletivoInput;
+    function Quantidade(const AValue: Double): IImpostoSeletivoInput;
+    function Unidade(const AValue: string): IImpostoSeletivoInput;
+    function ImpostoInformado(const AValue: Double): IImpostoSeletivoInput;
+    function CClassTrib(const AValue: string): IImpostoSeletivoInput;
     function ToJSON: TJSONObject;
-
-    property CSTValue: string read fpCST write fpCST;
-    property BaseCalculoValue: Double read fpBaseCalculo write fpBaseCalculo;
-    property QuantidadeValue: Double read fpQuantidade write fpQuantidade;
-    property UnidadeValue: string read fpUnidade write fpUnidade;
-    property ImpostoInformadoValue: Double read fpImpostoInformado write fpImpostoInformado;
-    property CClassTribValue: string read fpCClassTrib write fpCClassTrib;
   end;
 
-  TOperacaoInput = class;
-
-  TItemOperacaoInput = class
+  TItemOperacaoInput = class(TInterfacedObject, IItemOperacaoInput)
   private
-    fpParent: TOperacaoInput;
+    fpParent: IOperacaoInput;
     fpNumero: Integer;
     fpNCM: string;
     fpNBS: string;
@@ -64,83 +110,70 @@ type
     fpBaseCalculo: Double;
     fpQuantidade: Double;
     fpUnidade: string;
-    fpImpostoSeletivo: TImpostoSeletivoInput;
-    fpTributacaoRegular: TTributacaoRegularInput;
-    fpCClassTrib: string; // required
+    fpImpostoSeletivo: IImpostoSeletivoInput;
+    fpTributacaoRegular: ITributacaoRegularInput;
+    fpCClassTrib: string;
   public
-    constructor Create(AParent: TOperacaoInput);
-    destructor Destroy; override;
+    constructor Create(const AParent: IOperacaoInput);
+    class function New(const AParent: IOperacaoInput): IItemOperacaoInput; static;
 
-    function Numero(const AValue: Integer): TItemOperacaoInput;
-    function NCM(const AValue: string): TItemOperacaoInput;
-    function NBS(const AValue: string): TItemOperacaoInput;
-    function CST(const AValue: string): TItemOperacaoInput;
-    function BaseCalculo(const AValue: Double): TItemOperacaoInput;
-    function Quantidade(const AValue: Double): TItemOperacaoInput;
-    function Unidade(const AValue: string): TItemOperacaoInput;
-    function CClassTrib(const AValue: string): TItemOperacaoInput;
+    { IItemOperacaoInput }
+    function Numero(const AValue: Integer): IItemOperacaoInput;
+    function NCM(const AValue: string): IItemOperacaoInput;
+    function NBS(const AValue: string): IItemOperacaoInput;
+    function CST(const AValue: string): IItemOperacaoInput;
+    function BaseCalculo(const AValue: Double): IItemOperacaoInput;
+    function Quantidade(const AValue: Double): IItemOperacaoInput;
+    function Unidade(const AValue: string): IItemOperacaoInput;
+    function CClassTrib(const AValue: string): IItemOperacaoInput;
 
-    function ImpostoSeletivo: TImpostoSeletivoInput;
-    function TributacaoRegular: TTributacaoRegularInput;
-
-    function &End: TOperacaoInput;
+    function ImpostoSeletivo: IImpostoSeletivoInput;
+    function TributacaoRegular: ITributacaoRegularInput;
+    function &End: IOperacaoInput;
 
     function ToJSON: TJSONObject;
-
-    property NumeroValue: Integer read fpNumero write fpNumero;
-    property NCMValue: string read fpNCM write fpNCM;
-    property NBSValue: string read fpNBS write fpNBS;
-    property CSTValue: string read fpCST write fpCST;
-    property BaseCalculoValue: Double read fpBaseCalculo write fpBaseCalculo;
-    property QuantidadeValue: Double read fpQuantidade write fpQuantidade;
-    property UnidadeValue: string read fpUnidade write fpUnidade;
-    property CClassTribValue: string read fpCClassTrib write fpCClassTrib;
   end;
 
-  TItensOperacaoInput = class(specialize TFPGObjectList<TItemOperacaoInput>)
-  end;
-
-  TOperacaoInput = class
+  TOperacaoInput = class(TInterfacedObject, IOperacaoInput)
   private
-    fpId: string;                 
-    fpVersao: string;             
-    fpDataHoraEmissao: string;    
-    fpMunicipio: Int64;           
-    fpUF: string;                 
-    fpItens: TItensOperacaoInput; 
+    fpId: string;
+    fpVersao: string;
+    fpDataHoraEmissao: string;
+    fpMunicipio: Int64;
+    fpUF: string;
+    fpItens: array of IItemOperacaoInput;
   public
-    constructor Create;
-    destructor Destroy; override;
+    class function New: IOperacaoInput; static;
 
-    function Id(const AValue: string): TOperacaoInput;
-    function Versao(const AValue: string): TOperacaoInput;
-    function DataHoraEmissaoISO(const AISO: string): TOperacaoInput;
-    function DataHoraEmissao(const AWhen: TDateTime; const ATZOffsetMinutes: Integer = 0): TOperacaoInput;
-    function Municipio(const AValue: Int64): TOperacaoInput;
-    function UF(const AValue: string): TOperacaoInput;
-    function AddItem: TItemOperacaoInput;
+    { IOperacaoInput }
+    function Id(const AValue: string): IOperacaoInput;
+    function Versao(const AValue: string): IOperacaoInput;
+    function DataHoraEmissaoISO(const AISO: string): IOperacaoInput;
+    function DataHoraEmissao(const AWhen: TDateTime; const ATZOffsetMinutes: Integer = 0): IOperacaoInput;
+    function Municipio(const AValue: Int64): IOperacaoInput;
+    function UF(const AValue: string): IOperacaoInput;
+
+    function AddItem: IItemOperacaoInput;
 
     function ToJSON: TJSONObject;
-
-    property Itens: TItensOperacaoInput read fpItens;
-    property IdValue: string read fpId write fpId;
-    property VersaoValue: string read fpVersao write fpVersao;
-    property DataHoraEmissaoValue: string read fpDataHoraEmissao write fpDataHoraEmissao;
-    property MunicipioValue: Int64 read fpMunicipio write fpMunicipio;
-    property UFValue: string read fpUF write fpUF;
   end;
 
 implementation
 
-{ TTributacaoRegularInput }
+{===================== TTributacaoRegularInput =====================}
 
-function TTributacaoRegularInput.CST(const AValue: string): TTributacaoRegularInput;
+class function TTributacaoRegularInput.New: ITributacaoRegularInput;
+begin
+  Result := TTributacaoRegularInput.Create;
+end;
+
+function TTributacaoRegularInput.CST(const AValue: string): ITributacaoRegularInput;
 begin
   fpCST := AValue;
   Result := Self;
 end;
 
-function TTributacaoRegularInput.CClassTrib(const AValue: string): TTributacaoRegularInput;
+function TTributacaoRegularInput.CClassTrib(const AValue: string): ITributacaoRegularInput;
 begin
   fpCClassTrib := AValue;
   Result := Self;
@@ -153,39 +186,44 @@ begin
   Result.Add('cClassTrib', fpCClassTrib);
 end;
 
-{ TImpostoSeletivoInput }
+{===================== TImpostoSeletivoInput =====================}
 
-function TImpostoSeletivoInput.CST(const AValue: string): TImpostoSeletivoInput;
+class function TImpostoSeletivoInput.New: IImpostoSeletivoInput;
+begin
+  Result := TImpostoSeletivoInput.Create;
+end;
+
+function TImpostoSeletivoInput.CST(const AValue: string): IImpostoSeletivoInput;
 begin
   fpCST := AValue;
   Result := Self;
 end;
 
-function TImpostoSeletivoInput.BaseCalculo(const AValue: Double): TImpostoSeletivoInput;
+function TImpostoSeletivoInput.BaseCalculo(const AValue: Double): IImpostoSeletivoInput;
 begin
   fpBaseCalculo := AValue;
   Result := Self;
 end;
 
-function TImpostoSeletivoInput.Quantidade(const AValue: Double): TImpostoSeletivoInput;
+function TImpostoSeletivoInput.Quantidade(const AValue: Double): IImpostoSeletivoInput;
 begin
   fpQuantidade := AValue;
   Result := Self;
 end;
 
-function TImpostoSeletivoInput.Unidade(const AValue: string): TImpostoSeletivoInput;
+function TImpostoSeletivoInput.Unidade(const AValue: string): IImpostoSeletivoInput;
 begin
   fpUnidade := AValue;
   Result := Self;
 end;
 
-function TImpostoSeletivoInput.ImpostoInformado(const AValue: Double): TImpostoSeletivoInput;
+function TImpostoSeletivoInput.ImpostoInformado(const AValue: Double): IImpostoSeletivoInput;
 begin
   fpImpostoInformado := AValue;
   Result := Self;
 end;
 
-function TImpostoSeletivoInput.CClassTrib(const AValue: string): TImpostoSeletivoInput;
+function TImpostoSeletivoInput.CClassTrib(const AValue: string): IImpostoSeletivoInput;
 begin
   fpCClassTrib := AValue;
   Result := Self;
@@ -202,86 +240,84 @@ begin
   Result.Add('cClassTrib', fpCClassTrib);
 end;
 
-{ TItemOperacaoInput }
+{===================== TItemOperacaoInput =====================}
 
-constructor TItemOperacaoInput.Create(AParent: TOperacaoInput);
+constructor TItemOperacaoInput.Create(const AParent: IOperacaoInput);
 begin
   inherited Create;
   fpParent := AParent;
 end;
 
-destructor TItemOperacaoInput.Destroy;
+class function TItemOperacaoInput.New(const AParent: IOperacaoInput): IItemOperacaoInput;
 begin
-  fpImpostoSeletivo.Free;
-  fpTributacaoRegular.Free;
-  inherited Destroy;
+  Result := TItemOperacaoInput.Create(AParent);
 end;
 
-function TItemOperacaoInput.Numero(const AValue: Integer): TItemOperacaoInput;
+function TItemOperacaoInput.Numero(const AValue: Integer): IItemOperacaoInput;
 begin
   fpNumero := AValue;
   Result := Self;
 end;
 
-function TItemOperacaoInput.NCM(const AValue: string): TItemOperacaoInput;
+function TItemOperacaoInput.NCM(const AValue: string): IItemOperacaoInput;
 begin
   fpNCM := AValue;
   fpNBS := '';
   Result := Self;
 end;
 
-function TItemOperacaoInput.NBS(const AValue: string): TItemOperacaoInput;
+function TItemOperacaoInput.NBS(const AValue: string): IItemOperacaoInput;
 begin
   fpNBS := AValue;
   fpNCM := '';
   Result := Self;
 end;
 
-function TItemOperacaoInput.CST(const AValue: string): TItemOperacaoInput;
+function TItemOperacaoInput.CST(const AValue: string): IItemOperacaoInput;
 begin
   fpCST := AValue;
   Result := Self;
 end;
 
-function TItemOperacaoInput.BaseCalculo(const AValue: Double): TItemOperacaoInput;
+function TItemOperacaoInput.BaseCalculo(const AValue: Double): IItemOperacaoInput;
 begin
   fpBaseCalculo := AValue;
   Result := Self;
 end;
 
-function TItemOperacaoInput.Quantidade(const AValue: Double): TItemOperacaoInput;
+function TItemOperacaoInput.Quantidade(const AValue: Double): IItemOperacaoInput;
 begin
   fpQuantidade := AValue;
   Result := Self;
 end;
 
-function TItemOperacaoInput.Unidade(const AValue: string): TItemOperacaoInput;
+function TItemOperacaoInput.Unidade(const AValue: string): IItemOperacaoInput;
 begin
   fpUnidade := AValue;
   Result := Self;
 end;
 
-function TItemOperacaoInput.CClassTrib(const AValue: string): TItemOperacaoInput;
+function TItemOperacaoInput.CClassTrib(const AValue: string): IItemOperacaoInput;
 begin
   fpCClassTrib := AValue;
   Result := Self;
 end;
 
-function TItemOperacaoInput.ImpostoSeletivo: TImpostoSeletivoInput;
+function TItemOperacaoInput.ImpostoSeletivo: IImpostoSeletivoInput;
 begin
   if fpImpostoSeletivo = nil then
-    fpImpostoSeletivo := TImpostoSeletivoInput.Create;
+    fpImpostoSeletivo := TImpostoSeletivoInput.New;
   Result := fpImpostoSeletivo;
 end;
 
-function TItemOperacaoInput.TributacaoRegular: TTributacaoRegularInput;
+function TItemOperacaoInput.TributacaoRegular: ITributacaoRegularInput;
 begin
   if fpTributacaoRegular = nil then
-    fpTributacaoRegular := TTributacaoRegularInput.Create;
+    fpTributacaoRegular := TTributacaoRegularInput.New;
   Result := fpTributacaoRegular;
 end;
 
-function TItemOperacaoInput.&End: TOperacaoInput;
+function TItemOperacaoInput.&End: IOperacaoInput;
 begin
   Result := fpParent;
 end;
@@ -307,66 +343,65 @@ begin
   Result.Add('cClassTrib', fpCClassTrib);
 end;
 
-{ TOperacaoInput }
+{===================== TOperacaoInput =====================}
 
-constructor TOperacaoInput.Create;
+class function TOperacaoInput.New: IOperacaoInput;
 begin
-  inherited Create;
-  fpItens := TItensOperacaoInput.Create(True);
+  Result := TOperacaoInput.Create;
 end;
 
-destructor TOperacaoInput.Destroy;
-begin
-  fpItens.Free;
-  inherited Destroy;
-end;
-
-function TOperacaoInput.Id(const AValue: string): TOperacaoInput;
+function TOperacaoInput.Id(const AValue: string): IOperacaoInput;
 begin
   fpId := AValue;
   Result := Self;
 end;
 
-function TOperacaoInput.Versao(const AValue: string): TOperacaoInput;
+function TOperacaoInput.Versao(const AValue: string): IOperacaoInput;
 begin
   fpVersao := AValue;
   Result := Self;
 end;
 
-function TOperacaoInput.DataHoraEmissaoISO(const AISO: string): TOperacaoInput;
+function TOperacaoInput.DataHoraEmissaoISO(const AISO: string): IOperacaoInput;
 begin
   fpDataHoraEmissao := AISO;
   Result := Self;
 end;
 
-function TOperacaoInput.DataHoraEmissao(const AWhen: TDateTime; const ATZOffsetMinutes: Integer): TOperacaoInput;
+function TOperacaoInput.DataHoraEmissao(const AWhen: TDateTime; const ATZOffsetMinutes: Integer): IOperacaoInput;
 begin
   fpDataHoraEmissao := DateTimeToISO8601TZ(AWhen, ATZOffsetMinutes);
   Result := Self;
 end;
 
-function TOperacaoInput.Municipio(const AValue: Int64): TOperacaoInput;
+function TOperacaoInput.Municipio(const AValue: Int64): IOperacaoInput;
 begin
   fpMunicipio := AValue;
   Result := Self;
 end;
 
-function TOperacaoInput.UF(const AValue: string): TOperacaoInput;
+function TOperacaoInput.UF(const AValue: string): IOperacaoInput;
 begin
   fpUF := AValue;
   Result := Self;
 end;
 
-function TOperacaoInput.AddItem: TItemOperacaoInput;
+function TOperacaoInput.AddItem: IItemOperacaoInput;
+var
+  L: IItemOperacaoInput;
+  N: Integer;
 begin
-  Result := TItemOperacaoInput.Create(Self);
-  fpItens.Add(Result);
+  L := TItemOperacaoInput.New(Self);
+  N := Length(fpItens);
+  SetLength(fpItens, N + 1);
+  fpItens[N] := L;
+  Result := L;
 end;
 
 function TOperacaoInput.ToJSON: TJSONObject;
 var
   LArr: TJSONArray;
-  LIt: TItemOperacaoInput;
+  I: Integer;
 begin
   Result := TJSONObject.Create;
   Result.Add('id', fpId);
@@ -376,9 +411,10 @@ begin
   Result.Add('uf', fpUF);
 
   LArr := TJSONArray.Create;
-  for LIt in fpItens do
-    LArr.Add(LIt.ToJSON);
+  for I := 0 to High(fpItens) do
+    LArr.Add(fpItens[I].ToJSON);
   Result.Add('itens', LArr);
 end;
 
 end.
+

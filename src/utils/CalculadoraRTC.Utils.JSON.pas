@@ -20,6 +20,8 @@ function GetJSONExt(const AText: string; const AUseUTF8: Boolean = True): TJSOND
 function JSONGetFloat(AObj: TJSONObject; const AKey: string): Double;
 function JSONGetInt(AObj: TJSONObject; const AKey: string): Integer;
 function JSONGetInt64(AObj: TJSONObject; const AKey: string): Int64;
+function JSONGetString(AObj: TJSONObject; const AKey: string; const ADefaultValue: string): string;
+function JSONGetBool(AObj: TJSONObject; const AKey: string; const ADefaultValue: Boolean): Boolean;
 
 function SafeGetObj(AParent: TJSONObject; const AName: string): TJSONObject;
 function SafeGetArr(AParent: TJSONObject; const AName: string): TJSONArray;
@@ -231,6 +233,76 @@ begin
     Result := 0;
   end;
 end;
+
+function JSONGetString(AObj: TJSONObject; const AKey: string;
+  const ADefaultValue: string): string;
+var
+  D: TJSONData;
+  LFS: TFormatSettings;
+begin
+  Result := ADefaultValue;
+  if (AObj = nil) then Exit;
+
+  D := AObj.Find(AKey);
+  if D = nil then Exit;
+
+  case D.JSONType of
+    jtString:
+      Result := TJSONString(D).AsString;
+
+    jtNumber:
+      begin
+        LFS := DefaultFormatSettings;
+        LFS.DecimalSeparator := '.';
+        Result := FloatToStr(TJSONNumber(D).AsFloat, FormatSettings);
+      end;
+
+    jtBoolean:
+      Result := BoolToStr(TJSONBoolean(D).AsBoolean, True);
+
+    jtNull:
+      Result := ADefaultValue;
+
+  else
+    Result := ADefaultValue;
+  end;
+end;
+
+function JSONGetBool(AObj: TJSONObject; const AKey: string;
+  const ADefaultValue: Boolean): Boolean;
+var
+  D: TJSONData;
+  S: String;
+begin
+  Result := ADefaultValue;
+  if (AObj = nil) then Exit;
+
+  D := AObj.Find(AKey);
+  if D = nil then Exit;
+
+  case D.JSONType of
+    jtBoolean:
+      Result := TJSONBoolean(D).AsBoolean;
+
+    jtNumber:
+      // Considera 0 como False e qualquer outro valor como True
+      Result := (TJSONNumber(D).AsFloat <> 0);
+
+    jtString:
+      begin
+        S := Trim(LowerCase(TJSONString(D).AsString));
+        if S = 'true' then Result := True
+        else if S = 'false' then Result := False
+        else if S = '1' then Result := True
+        else if S = '0' then Result := False
+        else Result := ADefaultValue;
+      end;
+
+    else
+      Result := ADefaultValue;
+  end;
+end;
+
 
 function SafeGetObj(AParent: TJSONObject; const AName: string): TJSONObject;
 var

@@ -5,412 +5,932 @@ unit CalculadoraRTC.Schemas.DadosAbertos;
 interface
 
 uses
-  Classes, SysUtils,
-  fgl, fpjson,
+  Classes, SysUtils, fpjson, jsonparser, fgl,
   CalculadoraRTC.Utils.JSON;
 
 type
-  TVersaoInfo = class
-  private
-    fpAppVersion: string;
-    fpDbVersion: string;
-    fpRaw: TJSONObject;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TVersaoInfo; static;
-
-    property AppVersion: string read fpAppVersion write fpAppVersion;
-    property DbVersion: string read fpDbVersion write fpDbVersion;
-    property Raw: TJSONObject read fpRaw;
+  IVersaoOutput = interface
+    ['{B0E2B1E8-2B32-4D6B-B7B1-5A0FE8B9B9F5}']
+    function VersaoApp: string;
+    function VersaoDb: string;
+    function DescricaoVersaoDb: string;
+    function DataVersaoDb: string;
+    function Ambiente: string;
   end;
 
-  TUF = class
+  TVersaoOutput = class(TInterfacedObject, IVersaoOutput)
   private
-    fpCodigoUf: Int64;
+    fpVersaoApp: string;
+    fpVersaoDb: string;
+    fpDescricaoVersaoDb: string;
+    fpDataVersaoDb: string;
+    fpAmbiente: string;
+  public
+    class function New: IVersaoOutput; static;
+    class function FromJSON(AJson: TJSONData): IVersaoOutput; static;
+
+    function VersaoApp: string;
+    function VersaoDb: string;
+    function DescricaoVersaoDb: string;
+    function DataVersaoDb: string;
+    function Ambiente: string;
+  end;
+
+  IUFOutput = interface
+    ['{A6E8F8E0-5D41-4010-9B77-0B4F7E6F4B64}']
+    function Sigla: string;
+    function Nome: string;
+    function Codigo: Int64;
+  end;
+
+  TUFOutput = class(TInterfacedObject, IUFOutput)
+  private
     fpSigla: string;
     fpNome: string;
-    fpRaw: TJSONObject;
+    fpCodigo: Int64;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TUF; static;
+    class function New: IUFOutput; static;
+    class function FromJSON(AJson: TJSONData): IUFOutput; static;
 
-    property CodigoUf: Int64 read fpCodigoUf write fpCodigoUf;
-    property Sigla: string read fpSigla write fpSigla;
-    property Nome: string read fpNome write fpNome;
-    property Raw: TJSONObject read fpRaw;
+    function Sigla: string;
+    function Nome: string;
+    function Codigo: Int64;
   end;
 
-  TUFList = specialize TFPGObjectList<TUF>;
+  TListaUF = specialize TFPGList<IUFOutput>;
 
-  TMunicipio = class
+  IMunicipioOutput = interface
+    ['{B8C7164E-6A25-4D3B-9D0E-4F0A5B9A9A53}']
+    function Codigo: Int64;
+    function Nome: string;
+  end;
+
+  TMunicipioOutput = class(TInterfacedObject, IMunicipioOutput)
   private
-    fpCodigoMunicipio: Int64;
+    fpCodigo: Int64;
     fpNome: string;
-    fpSiglaUf: string;
-    fpRaw: TJSONObject;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TMunicipio; static;
+    class function New: IMunicipioOutput; static;
+    class function FromJSON(AJson: TJSONData): IMunicipioOutput; static;
 
-    property CodigoMunicipio: Int64 read fpCodigoMunicipio write fpCodigoMunicipio;
-    property Nome: string read fpNome write fpNome;
-    property SiglaUf: string read fpSiglaUf write fpSiglaUf;
-    property Raw: TJSONObject read fpRaw;
+    function Codigo: Int64;
+    function Nome: string;
   end;
 
-  TMunicipioList = specialize TFPGObjectList<TMunicipio>;
+  TListaMunicipio = specialize TFPGList<IMunicipioOutput>;
 
-  TSituacaoTributaria = class
+  ISituacaoTributariaOutput = interface
+    ['{8F7C7D36-6D2B-4FCE-9D0A-7B4D2C3E92A1}']
+    function Id: Int64;
+    function Codigo: string;
+    function Descricao: string;
+  end;
+
+  TSituacaoTributariaOutput = class(TInterfacedObject, ISituacaoTributariaOutput)
   private
     fpId: Int64;
     fpCodigo: string;
     fpDescricao: string;
-    fpRaw: TJSONObject;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TSituacaoTributaria; static;
+    class function New: ISituacaoTributariaOutput; static;
+    class function FromJSON(AJson: TJSONData): ISituacaoTributariaOutput; static;
 
-    property Id: Int64 read fpId write fpId;
-    property Codigo: string read fpCodigo write fpCodigo;
-    property Descricao: string read fpDescricao write fpDescricao;
-    property Raw: TJSONObject read fpRaw;
+    function Id: Int64;
+    function Codigo: string;
+    function Descricao: string;
   end;
 
-  TSituacaoTributariaList = specialize TFPGObjectList<TSituacaoTributaria>;
+  TListaSituacaoTribCibs = specialize TFPGList<ISituacaoTributariaOutput>;
 
-  TNcmInfo = class
+  INcmOutput = interface
+    ['{A1E9A5D8-9D2C-4F1F-AE24-7A4E5E7B2B2E}']
+    function TributadoPeloImpostoSeletivo: Boolean;
+    function AliquotaAdValorem: Double;
+    function AliquotaAdRem: Double;
+    function Capitulo: string;
+    function Posicao: string;
+    function Subposicao: string;
+    function Item: string;
+    function Subitem: string;
+  end;
+
+  TNcmOutput = class(TInterfacedObject, INcmOutput)
+  private
+    fpTributadoPeloImpostoSeletivo: Boolean;
+    fpAliquotaAdValorem: Double;
+    fpAliquotaAdRem: Double;
+    fpCapitulo: string;
+    fpPosicao: string;
+    fpSubposicao: string;
+    fpItem: string;
+    fpSubitem: string;
+  public
+    class function New: INcmOutput; static;
+    class function FromJSON(AJson: TJSONData): INcmOutput; static;
+
+    function TributadoPeloImpostoSeletivo: Boolean;
+    function AliquotaAdValorem: Double;
+    function AliquotaAdRem: Double;
+    function Capitulo: string;
+    function Posicao: string;
+    function Subposicao: string;
+    function Item: string;
+    function Subitem: string;
+  end;
+
+  TListaNCM = specialize TFPGList<INcmOutput>;
+
+  INbsOutput = interface
+    ['{D4B0B8CD-9E3D-4E0D-8E59-66C8D7B2F9C5}']
+    function TributadoPeloImpostoSeletivo: Boolean;
+    function AliquotaAdValorem: Double;
+    function Capitulo: string;
+    function Posicao: string;
+    function Subposicao1: string;
+    function Subposicao2: string;
+    function Item: string;
+  end;
+
+  TNbsOutput = class(TInterfacedObject, INbsOutput)
+  private
+    fpTributadoPeloImpostoSeletivo: Boolean;
+    fpAliquotaAdValorem: Double;
+    fpCapitulo: string;
+    fpPosicao: string;
+    fpSubposicao1: string;
+    fpSubposicao2: string;
+    fpItem: string;
+  public
+    class function New: INbsOutput; static;
+    class function FromJSON(AJson: TJSONData): INbsOutput; static;
+
+    function TributadoPeloImpostoSeletivo: Boolean;
+    function AliquotaAdValorem: Double;
+    function Capitulo: string;
+    function Posicao: string;
+    function Subposicao1: string;
+    function Subposicao2: string;
+    function Item: string;
+  end;
+
+  TListaNBS = specialize TFPGList<INbsOutput>;
+
+  IFundamentacaoClassificacaoOutput = interface
+    ['{0EBA3A72-5E5D-4A51-8D41-9E7D1E68E4F0}']
+    function CodigoClassificacaoTributaria: string;
+    function DescricaoClassificacaoTributaria: string;
+    function CodigoSituacaoTributaria: string;
+    function DescricaoSituacaoTributaria: string;
+    function ConjuntoTributo: string;
+    function Texto: string;
+    function TextoCurto: string;
+    function ReferenciaNormativa: string;
+  end;
+
+  TFundamentacaoClassificacaoOutput = class(TInterfacedObject, IFundamentacaoClassificacaoOutput)
+  private
+    fpCodigoClassificacaoTributaria: string;
+    fpDescricaoClassificacaoTributaria: string;
+    fpCodigoSituacaoTributaria: string;
+    fpDescricaoSituacaoTributaria: string;
+    fpConjuntoTributo: string;
+    fpTexto: string;
+    fpTextoCurto: string;
+    fpReferenciaNormativa: string;
+  public
+    class function New: IFundamentacaoClassificacaoOutput; static;
+    class function FromJSON(AJson: TJSONData): IFundamentacaoClassificacaoOutput; static;
+
+    function CodigoClassificacaoTributaria: string;
+    function DescricaoClassificacaoTributaria: string;
+    function CodigoSituacaoTributaria: string;
+    function DescricaoSituacaoTributaria: string;
+    function ConjuntoTributo: string;
+    function Texto: string;
+    function TextoCurto: string;
+    function ReferenciaNormativa: string;
+  end;
+
+  TListaFundClass = specialize TFPGList<IFundamentacaoClassificacaoOutput>;
+
+  IClassificacaoTributariaOutput = interface
+    ['{C0D2F12E-3CC3-4B73-9C51-2E6D9D5E8AA0}']
+    function Codigo: string;
+    function Descricao: string;
+    function TipoAliquota: string;
+    function Nomenclatura: string;
+    function DescricaoTratamentoTributario: string;
+    function IncompativelComSuspensao: Boolean;
+    function ExigeGrupoDesoneracao: Boolean;
+    function PossuiPercentualReducao: Boolean;
+    function IndicaApropriacaoCreditoAdquirenteCbs: Boolean;
+    function IndicaApropriacaoCreditoAdquirenteIbs: Boolean;
+    function IndicaCreditoPresumidoFornecedor: Boolean;
+    function IndicaCreditoPresumidoAdquirente: Boolean;
+    function CreditoOperacaoAntecedente: string;
+    function PercentualReducaoCbs: Double;
+    function PercentualReducaoIbsUf: Double;
+    function PercentualReducaoIbsMun: Double;
+  end;
+
+  TClassificacaoTributariaOutput = class(TInterfacedObject, IClassificacaoTributariaOutput)
   private
     fpCodigo: string;
     fpDescricao: string;
-    fpRaw: TJSONObject;
+    fpTipoAliquota: string;
+    fpNomenclatura: string;
+    fpDescricaoTratamentoTributario: string;
+    fpIncompativelComSuspensao: Boolean;
+    fpExigeGrupoDesoneracao: Boolean;
+    fpPossuiPercentualReducao: Boolean;
+    fpIndicaApropriacaoCreditoAdquirenteCbs: Boolean;
+    fpIndicaApropriacaoCreditoAdquirenteIbs: Boolean;
+    fpIndicaCreditoPresumidoFornecedor: Boolean;
+    fpIndicaCreditoPresumidoAdquirente: Boolean;
+    fpCreditoOperacaoAntecedente: string;
+    fpPercentualReducaoCbs: Double;
+    fpPercentualReducaoIbsUf: Double;
+    fpPercentualReducaoIbsMun: Double;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TNcmInfo; static;
+    class function New: IClassificacaoTributariaOutput; static;
+    class function FromJSON(AJson: TJSONData): IClassificacaoTributariaOutput; static;
 
-    property Codigo: string read fpCodigo write fpCodigo;
-    property Descricao: string read fpDescricao write fpDescricao;
-    property Raw: TJSONObject read fpRaw;
+    function Codigo: string;
+    function Descricao: string;
+    function TipoAliquota: string;
+    function Nomenclatura: string;
+    function DescricaoTratamentoTributario: string;
+    function IncompativelComSuspensao: Boolean;
+    function ExigeGrupoDesoneracao: Boolean;
+    function PossuiPercentualReducao: Boolean;
+    function IndicaApropriacaoCreditoAdquirenteCbs: Boolean;
+    function IndicaApropriacaoCreditoAdquirenteIbs: Boolean;
+    function IndicaCreditoPresumidoFornecedor: Boolean;
+    function IndicaCreditoPresumidoAdquirente: Boolean;
+    function CreditoOperacaoAntecedente: string;
+    function PercentualReducaoCbs: Double;
+    function PercentualReducaoIbsUf: Double;
+    function PercentualReducaoIbsMun: Double;
   end;
 
-  TNcmInfoList = specialize TFPGObjectList<TNcmInfo>;
+  TListaClassTrib = specialize TFPGList<IClassificacaoTributariaOutput>;
 
-  TNbsInfo = class
+  IAliquotaOutput = interface
+    ['{B1EDFF4C-2F8C-4C2C-8F78-2511AB03B278}']
+    function AliquotaReferencia: Double;
+    function AliquotaPropria: Double;
+    function FormaAplicacao: string; // SUBSTITUICAO | ACRESCIMO | DECRESCIMO
+  end;
+
+  TAliquotaOutput = class(TInterfacedObject, IAliquotaOutput)
   private
-    fpCodigo: string;
-    fpDescricao: string;
-    fpRaw: TJSONObject;
+    fpAliquotaReferencia: Double;
+    fpAliquotaPropria: Double;
+    fpFormaAplicacao: string;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TNbsInfo; static;
+    class function New: IAliquotaOutput; static;
+    class function FromJSON(AJson: TJSONData): IAliquotaOutput; static;
 
-    property Codigo: string read fpCodigo write fpCodigo;
-    property Descricao: string read fpDescricao write fpDescricao;
-    property Raw: TJSONObject read fpRaw;
+    function AliquotaReferencia: Double;
+    function AliquotaPropria: Double;
+    function FormaAplicacao: string;
   end;
 
-  TNbsInfoList = specialize TFPGObjectList<TNbsInfo>;
+  TListaAliquota = specialize TFPGList<IAliquotaOutput>;
 
-  TFundamentacaoLegal = class
-  private
-    fpId: Int64;
-    fpDescricao: string;
-    fpDispositivoLegal: string;
-    fpRaw: TJSONObject;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TFundamentacaoLegal; static;
-
-    property Id: Int64 read fpId write fpId;
-    property Descricao: string read fpDescricao write fpDescricao;
-    property DispositivoLegal: string read fpDispositivoLegal write fpDispositivoLegal;
-    property Raw: TJSONObject read fpRaw;
-  end;
-
-  TFundamentacaoLegalList = specialize TFPGObjectList<TFundamentacaoLegal>;
-
-  TClassificacaoTributaria = class
-  private
-    fpId: Int64;
-    fpCClassTrib: string;
-    fpDescricao: string;
-    fpTipo: string;
-    fpRaw: TJSONObject;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TClassificacaoTributaria; static;
-
-    property Id: Int64 read fpId write fpId;
-    property CClassTrib: string read fpCClassTrib write fpCClassTrib;
-    property Descricao: string read fpDescricao write fpDescricao;
-    property Tipo: string read fpTipo write fpTipo;
-    property Raw: TJSONObject read fpRaw;
-  end;
-
-  TClassificacaoTributariaList = specialize TFPGObjectList<TClassificacaoTributaria>;
-
-  TAliquotaUniao = class
-  private
-    fpData: string;
-    fpPCBS: Double;
-    fpRaw: TJSONObject;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TAliquotaUniao; static;
-
-    property Data: string read fpData write fpData;
-    property PCBS: Double read fpPCBS write fpPCBS;
-    property Raw: TJSONObject read fpRaw;
-  end;
-
-  TAliquotaUF = class
-  private
-    fpCodigoUf: Int64;
-    fpData: string;
-    fpPIBSUF: Double;
-    fpRaw: TJSONObject;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TAliquotaUF; static;
-
-    property CodigoUf: Int64 read fpCodigoUf write fpCodigoUf;
-    property Data: string read fpData write fpData;
-    property PIBSUF: Double read fpPIBSUF write fpPIBSUF;
-    property Raw: TJSONObject read fpRaw;
-  end;
-
-  TAliquotaMunicipio = class
-  private
-    fpCodigoMunicipio: Int64;
-    fpData: string;
-    fpPIBSMun: Double;
-    fpRaw: TJSONObject;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TAliquotaMunicipio; static;
-
-    property CodigoMunicipio: Int64 read fpCodigoMunicipio write fpCodigoMunicipio;
-    property Data: string read fpData write fpData;
-    property PIBSMun: Double read fpPIBSMun write fpPIBSMun;
-    property Raw: TJSONObject read fpRaw;
-  end;
+  function ParseListaUF(AData: TJSONData): TListaUF;
+  function ParseListaMunicipio(AData: TJSONData): TListaMunicipio;
+  function ParseListaSitTribCibs(AData: TJSONData): TListaSituacaoTribCibs;
+  function ParseListaNCM(AData: TJSONData): TListaNCM;
+  function ParseListaNBS(AData: TJSONData): TListaNBS;
+  function ParseListaFundClass(AData: TJSONData): TListaFundClass;
+  function ParseListaClassificacaoTributaria(AData: TJSONData): TListaClassTrib;
+  function ParseListaAliquota(AData: TJSONData): TListaAliquota;
 
 implementation
 
-{ TVersaoInfo }
-
-destructor TVersaoInfo.Destroy;
+function ParseListaUF(AData: TJSONData): TListaUF;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TVersaoInfo.FromJSON(AObj: TJSONObject): TVersaoInfo;
-begin
-  Result := TVersaoInfo.Create;
-  if AObj = nil then
+  Result := TListaUF.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpAppVersion := AObj.Get('appVersion', AObj.Get('versaoApp', ''));
-  Result.fpDbVersion := AObj.Get('dbVersion', AObj.Get('versaoBD', ''));
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TUFOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TUF }
-
-destructor TUF.Destroy;
+function ParseListaMunicipio(AData: TJSONData): TListaMunicipio;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TUF.FromJSON(AObj: TJSONObject): TUF;
-begin
-  Result := TUF.Create;
-  if AObj = nil then
+  Result := TListaMunicipio.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpCodigoUf := JSONGetInt64(AObj, 'codigoUf');
-  Result.fpSigla := AObj.Get('siglaUf', AObj.Get('sigla', ''));
-  Result.fpNome := AObj.Get('nome', '');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TMunicipioOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TMunicipio }
-
-destructor TMunicipio.Destroy;
+function ParseListaSitTribCibs(AData: TJSONData): TListaSituacaoTribCibs;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TMunicipio.FromJSON(AObj: TJSONObject): TMunicipio;
-begin
-  Result := TMunicipio.Create;
-  if AObj = nil then
+  Result := TListaSituacaoTribCibs.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpCodigoMunicipio := JSONGetInt64(AObj, 'codigoMunicipio');
-  Result.fpNome := AObj.Get('nome', '');
-  Result.fpSiglaUf := AObj.Get('siglaUf', '');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TSituacaoTributariaOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TSituacaoTributaria }
-
-destructor TSituacaoTributaria.Destroy;
+function ParseListaNCM(AData: TJSONData): TListaNCM;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TSituacaoTributaria.FromJSON(AObj: TJSONObject): TSituacaoTributaria;
-begin
-  Result := TSituacaoTributaria.Create;
-  if AObj = nil then
+  Result := TListaNCM.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpId := JSONGetInt64(AObj, 'id');
-  Result.fpCodigo := AObj.Get('codigo', '');
-  Result.fpDescricao := AObj.Get('descricao', '');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TNcmOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TNcmInfo }
-
-destructor TNcmInfo.Destroy;
+function ParseListaNBS(AData: TJSONData): TListaNBS;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TNcmInfo.FromJSON(AObj: TJSONObject): TNcmInfo;
-begin
-  Result := TNcmInfo.Create;
-  if AObj = nil then
+  Result := TListaNBS.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpCodigo := AObj.Get('ncm', AObj.Get('codigo', ''));
-  Result.fpDescricao := AObj.Get('descricao', '');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TNbsOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TNbsInfo }
 
-destructor TNbsInfo.Destroy;
+function ParseListaFundClass(AData: TJSONData): TListaFundClass;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TNbsInfo.FromJSON(AObj: TJSONObject): TNbsInfo;
-begin
-  Result := TNbsInfo.Create;
-  if AObj = nil then
+  Result := TListaFundClass.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpCodigo := AObj.Get('nbs', AObj.Get('codigo', ''));
-  Result.fpDescricao := AObj.Get('descricao', '');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TFundamentacaoClassificacaoOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TFundamentacaoLegal }
-
-destructor TFundamentacaoLegal.Destroy;
+function ParseListaClassificacaoTributaria(AData: TJSONData): TListaClassTrib;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TFundamentacaoLegal.FromJSON(AObj: TJSONObject): TFundamentacaoLegal;
-begin
-  Result := TFundamentacaoLegal.Create;
-  if AObj = nil then
+  Result := TListaClassTrib.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpId := JSONGetInt64(AObj, 'id');
-  Result.fpDescricao := AObj.Get('descricao', '');
-  Result.fpDispositivoLegal := AObj.Get('dispositivoLegal', AObj.Get('baseLegal', ''));
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TClassificacaoTributariaOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TClassificacaoTributaria }
-
-destructor TClassificacaoTributaria.Destroy;
+function ParseListaAliquota(AData: TJSONData): TListaAliquota;
+var
+  LArr: TJSONArray;
+  I: Integer;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
-end;
-
-class function TClassificacaoTributaria.FromJSON(AObj: TJSONObject): TClassificacaoTributaria;
-begin
-  Result := TClassificacaoTributaria.Create;
-  if AObj = nil then
+  Result := TListaAliquota.Create;
+  if (AData = nil) or (AData.JSONType <> jtArray) then
     Exit;
 
-  Result.fpId := JSONGetInt64(AObj, 'id');
-  Result.fpCClassTrib := AObj.Get('cClassTrib', '');
-  Result.fpDescricao := AObj.Get('descricao', '');
-  Result.fpTipo := AObj.Get('tipo', '');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LArr := TJSONArray(AData);
+  for I := 0 to LArr.Count - 1 do
+    Result.Add(TAliquotaOutput.FromJSON(LArr.Objects[I]));
 end;
 
-{ TAliquotaUniao }
+{ TVersaoOutput }
 
-destructor TAliquotaUniao.Destroy;
+class function TVersaoOutput.New: IVersaoOutput;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
+  Result := TVersaoOutput.Create;
 end;
 
-class function TAliquotaUniao.FromJSON(AObj: TJSONObject): TAliquotaUniao;
+class function TVersaoOutput.FromJSON(AJson: TJSONData): IVersaoOutput;
+var
+  LObj: TJSONObject;
+  LOut: TVersaoOutput;
 begin
-  Result := TAliquotaUniao.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpData := AObj.Get('data', '');
-  Result.fpPCBS := JSONGetFloat(AObj, 'pCBS');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  LOut := TVersaoOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpVersaoApp := JSONGetString(LObj, 'versaoApp', '');
+    LOut.fpVersaoDb := JSONGetString(LObj, 'versaoDb', '');
+    LOut.fpDescricaoVersaoDb := JSONGetString(LObj, 'descricaoVersaoDb', '');
+    LOut.fpDataVersaoDb := JSONGetString(LObj, 'dataVersaoDb', '');
+    LOut.fpAmbiente := JSONGetString(LObj, 'ambiente', '');
+  end;
+  Result := LOut;
 end;
 
-{ TAliquotaUF }
-
-destructor TAliquotaUF.Destroy;
+function TVersaoOutput.VersaoApp: string;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
+  Result := fpVersaoApp;
 end;
 
-class function TAliquotaUF.FromJSON(AObj: TJSONObject): TAliquotaUF;
+function TVersaoOutput.VersaoDb: string;
 begin
-  Result := TAliquotaUF.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpCodigoUf := JSONGetInt64(AObj, 'codigoUf');
-  Result.fpData := AObj.Get('data', '');
-  Result.fpPIBSUF := JSONGetFloat(AObj, 'pIBSUF');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+  Result := fpVersaoDb;
 end;
 
-{ TAliquotaMunicipio }
-
-destructor TAliquotaMunicipio.Destroy;
+function TVersaoOutput.DescricaoVersaoDb: string;
 begin
-  FreeAndNil(fpRaw);
-  inherited Destroy;
+  Result := fpDescricaoVersaoDb;
 end;
 
-class function TAliquotaMunicipio.FromJSON(AObj: TJSONObject): TAliquotaMunicipio;
+function TVersaoOutput.DataVersaoDb: string;
 begin
-  Result := TAliquotaMunicipio.Create;
-  if AObj = nil then
-    Exit;
+  Result := fpDataVersaoDb;
+end;
 
-  Result.fpCodigoMunicipio := JSONGetInt64(AObj, 'codigoMunicipio');
-  Result.fpData := AObj.Get('data', '');
-  Result.fpPIBSMun := JSONGetFloat(AObj, 'pIBSMun');
-  Result.fpRaw := TJSONObject(AObj.Clone);
+function TVersaoOutput.Ambiente: string;
+begin
+  Result := fpAmbiente;
+end;
+
+{ TUFOutput }
+
+class function TUFOutput.New: IUFOutput;
+begin
+  Result := TUFOutput.Create;
+end;
+
+class function TUFOutput.FromJSON(AJson: TJSONData): IUFOutput;
+var
+  LObj: TJSONObject;
+  LOut: TUFOutput;
+begin
+  LOut := TUFOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpSigla := JSONGetString(LObj, 'sigla', '');
+    LOut.fpNome := JSONGetString(LObj, 'nome', '');
+    LOut.fpCodigo := JSONGetInt64(LObj, 'codigo');
+  end;
+  Result := LOut;
+end;
+
+function TUFOutput.Sigla: string;
+begin
+  Result := fpSigla;
+end;
+
+function TUFOutput.Nome: string;
+begin
+  Result := fpNome;
+end;
+
+function TUFOutput.Codigo: Int64;
+begin
+  Result := fpCodigo;
+end;
+
+{ TMunicipioOutput }
+
+class function TMunicipioOutput.New: IMunicipioOutput;
+begin
+  Result := TMunicipioOutput.Create;
+end;
+
+class function TMunicipioOutput.FromJSON(AJson: TJSONData): IMunicipioOutput;
+var
+  LObj: TJSONObject;
+  LOut: TMunicipioOutput;
+begin
+  LOut := TMunicipioOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpCodigo := JSONGetInt64(LObj, 'codigo');
+    LOut.fpNome := JSONGetString(LObj, 'nome', '');
+  end;
+  Result := LOut;
+end;
+
+function TMunicipioOutput.Codigo: Int64;
+begin
+  Result := fpCodigo;
+end;
+
+function TMunicipioOutput.Nome: string;
+begin
+  Result := fpNome;
+end;
+
+{ TSituacaoTributariaOutput }
+
+class function TSituacaoTributariaOutput.New: ISituacaoTributariaOutput;
+begin
+  Result := TSituacaoTributariaOutput.Create;
+end;
+
+class function TSituacaoTributariaOutput.FromJSON(AJson: TJSONData): ISituacaoTributariaOutput;
+var
+  LObj: TJSONObject;
+  LOut: TSituacaoTributariaOutput;
+begin
+  LOut := TSituacaoTributariaOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpId := JSONGetInt64(LObj, 'id');
+    LOut.fpCodigo := JSONGetString(LObj, 'codigo', '');
+    LOut.fpDescricao := JSONGetString(LObj, 'descricao', '');
+  end;
+  Result := LOut;
+end;
+
+function TSituacaoTributariaOutput.Id: Int64;
+begin
+  Result := fpId;
+end;
+
+function TSituacaoTributariaOutput.Codigo: string;
+begin
+  Result := fpCodigo;
+end;
+
+function TSituacaoTributariaOutput.Descricao: string;
+begin
+  Result := fpDescricao;
+end;
+
+{ TNcmOutput }
+
+class function TNcmOutput.New: INcmOutput;
+begin
+  Result := TNcmOutput.Create;
+end;
+
+class function TNcmOutput.FromJSON(AJson: TJSONData): INcmOutput;
+var
+  LObj: TJSONObject;
+  LOut: TNcmOutput;
+begin
+  LOut := TNcmOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpTributadoPeloImpostoSeletivo := JSONGetBool(LObj, 'tributadoPeloImpostoSeletivo', False);
+    LOut.fpAliquotaAdValorem := JSONGetFloat(LObj, 'aliquotaAdValorem');
+    LOut.fpAliquotaAdRem := JSONGetFloat(LObj, 'aliquotaAdRem');
+    LOut.fpCapitulo := JSONGetString(LObj, 'capitulo', '');
+    LOut.fpPosicao := JSONGetString(LObj, 'posicao', '');
+    LOut.fpSubposicao := JSONGetString(LObj, 'subposicao', '');
+    LOut.fpItem := JSONGetString(LObj, 'item', '');
+    LOut.fpSubitem := JSONGetString(LObj, 'subitem', '');
+  end;
+  Result := LOut;
+end;
+
+function TNcmOutput.TributadoPeloImpostoSeletivo: Boolean;
+begin
+  Result := fpTributadoPeloImpostoSeletivo;
+end;
+
+function TNcmOutput.AliquotaAdValorem: Double;
+begin
+  Result := fpAliquotaAdValorem;
+end;
+
+function TNcmOutput.AliquotaAdRem: Double;
+begin
+  Result := fpAliquotaAdRem;
+end;
+
+function TNcmOutput.Capitulo: string;
+begin
+  Result := fpCapitulo;
+end;
+
+function TNcmOutput.Posicao: string;
+begin
+  Result := fpPosicao;
+end;
+
+function TNcmOutput.Subposicao: string;
+begin
+  Result := fpSubposicao;
+end;
+
+function TNcmOutput.Item: string;
+begin
+  Result := fpItem;
+end;
+
+function TNcmOutput.Subitem: string;
+begin
+  Result := fpSubitem;
+end;
+
+{ TNbsOutput }
+
+class function TNbsOutput.New: INbsOutput;
+begin
+  Result := TNbsOutput.Create;
+end;
+
+class function TNbsOutput.FromJSON(AJson: TJSONData): INbsOutput;
+var
+  LObj: TJSONObject;
+  LOut: TNbsOutput;
+begin
+  LOut := TNbsOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpTributadoPeloImpostoSeletivo := JSONGetBool(LObj, 'tributadoPeloImpostoSeletivo', False);
+    LOut.fpAliquotaAdValorem := JSONGetFloat(LObj, 'aliquotaAdValorem');
+    LOut.fpCapitulo := JSONGetString(LObj, 'capitulo', '');
+    LOut.fpPosicao := JSONGetString(LObj, 'posicao', '');
+    LOut.fpSubposicao1 := JSONGetString(LObj, 'subposicao1', '');
+    LOut.fpSubposicao2 := JSONGetString(LObj, 'subposicao2', '');
+    LOut.fpItem := JSONGetString(LObj, 'item', '');
+  end;
+  Result := LOut;
+end;
+
+function TNbsOutput.TributadoPeloImpostoSeletivo: Boolean;
+begin
+  Result := fpTributadoPeloImpostoSeletivo;
+end;
+
+function TNbsOutput.AliquotaAdValorem: Double;
+begin
+  Result := fpAliquotaAdValorem;
+end;
+
+function TNbsOutput.Capitulo: string;
+begin
+  Result := fpCapitulo;
+end;
+
+function TNbsOutput.Posicao: string;
+begin
+  Result := fpPosicao;
+end;
+
+function TNbsOutput.Subposicao1: string;
+begin
+  Result := fpSubposicao1;
+end;
+
+function TNbsOutput.Subposicao2: string;
+begin
+  Result := fpSubposicao2;
+end;
+
+function TNbsOutput.Item: string;
+begin
+  Result := fpItem;
+end;
+
+{ TFundamentacaoClassificacaoOutput }
+
+class function TFundamentacaoClassificacaoOutput.New: IFundamentacaoClassificacaoOutput;
+begin
+  Result := TFundamentacaoClassificacaoOutput.Create;
+end;
+
+class function TFundamentacaoClassificacaoOutput.FromJSON(AJson: TJSONData): IFundamentacaoClassificacaoOutput;
+var
+  LObj: TJSONObject;
+  LOut: TFundamentacaoClassificacaoOutput;
+begin
+  LOut := TFundamentacaoClassificacaoOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpCodigoClassificacaoTributaria := JSONGetString(LObj, 'codigoClassificacaoTributaria', '');
+    LOut.fpDescricaoClassificacaoTributaria := JSONGetString(LObj, 'descricaoClassificacaoTributaria', '');
+    LOut.fpCodigoSituacaoTributaria := JSONGetString(LObj, 'codigoSituacaoTributaria', '');
+    LOut.fpDescricaoSituacaoTributaria := JSONGetString(LObj, 'descricaoSituacaoTributaria', '');
+    LOut.fpConjuntoTributo := JSONGetString(LObj, 'conjuntoTributo', '');
+    LOut.fpTexto := JSONGetString(LObj, 'texto', '');
+    LOut.fpTextoCurto := JSONGetString(LObj, 'textoCurto', '');
+    LOut.fpReferenciaNormativa := JSONGetString(LObj, 'referenciaNormativa', '');
+  end;
+  Result := LOut;
+end;
+
+function TFundamentacaoClassificacaoOutput.CodigoClassificacaoTributaria: string;
+begin
+  Result := fpCodigoClassificacaoTributaria;
+end;
+
+function TFundamentacaoClassificacaoOutput.DescricaoClassificacaoTributaria: string;
+begin
+  Result := fpDescricaoClassificacaoTributaria;
+end;
+
+function TFundamentacaoClassificacaoOutput.CodigoSituacaoTributaria: string;
+begin
+  Result := fpCodigoSituacaoTributaria;
+end;
+
+function TFundamentacaoClassificacaoOutput.DescricaoSituacaoTributaria: string;
+begin
+  Result := fpDescricaoSituacaoTributaria;
+end;
+
+function TFundamentacaoClassificacaoOutput.ConjuntoTributo: string;
+begin
+  Result := fpConjuntoTributo;
+end;
+
+function TFundamentacaoClassificacaoOutput.Texto: string;
+begin
+  Result := fpTexto;
+end;
+
+function TFundamentacaoClassificacaoOutput.TextoCurto: string;
+begin
+  Result := fpTextoCurto;
+end;
+
+function TFundamentacaoClassificacaoOutput.ReferenciaNormativa: string;
+begin
+  Result := fpReferenciaNormativa;
+end;
+
+{ TClassificacaoTributariaOutput }
+
+class function TClassificacaoTributariaOutput.New: IClassificacaoTributariaOutput;
+begin
+  Result := TClassificacaoTributariaOutput.Create;
+end;
+
+class function TClassificacaoTributariaOutput.FromJSON(AJson: TJSONData): IClassificacaoTributariaOutput;
+var
+  LObj: TJSONObject;
+  LOut: TClassificacaoTributariaOutput;
+begin
+  LOut := TClassificacaoTributariaOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpCodigo := JSONGetString(LObj, 'codigo', '');
+    LOut.fpDescricao := JSONGetString(LObj, 'descricao', '');
+    LOut.fpTipoAliquota := JSONGetString(LObj, 'tipoAliquota', '');
+    LOut.fpNomenclatura := JSONGetString(LObj, 'nomenclatura', '');
+    LOut.fpDescricaoTratamentoTributario := JSONGetString(LObj, 'descricaoTratamentoTributario', '');
+    LOut.fpIncompativelComSuspensao := JSONGetBool(LObj, 'incompativelComSuspensao', False);
+    LOut.fpExigeGrupoDesoneracao := JSONGetBool(LObj, 'exigeGrupoDesoneracao', False);
+    LOut.fpPossuiPercentualReducao := JSONGetBool(LObj, 'possuiPercentualReducao', False);
+    LOut.fpIndicaApropriacaoCreditoAdquirenteCbs := JSONGetBool(LObj, 'indicaApropriacaoCreditoAdquirenteCbs', False);
+    LOut.fpIndicaApropriacaoCreditoAdquirenteIbs := JSONGetBool(LObj, 'indicaApropriacaoCreditoAdquirenteIbs', False);
+    LOut.fpIndicaCreditoPresumidoFornecedor := JSONGetBool(LObj, 'indicaCreditoPresumidoFornecedor', False);
+    LOut.fpIndicaCreditoPresumidoAdquirente := JSONGetBool(LObj, 'indicaCreditoPresumidoAdquirente', False);
+    LOut.fpCreditoOperacaoAntecedente := JSONGetString(LObj, 'creditoOperacaoAntecedente', '');
+    LOut.fpPercentualReducaoCbs := JSONGetFloat(LObj, 'percentualReducaoCbs');
+    LOut.fpPercentualReducaoIbsUf := JSONGetFloat(LObj, 'percentualReducaoIbsUf');
+    LOut.fpPercentualReducaoIbsMun := JSONGetFloat(LObj, 'percentualReducaoIbsMun');
+  end;
+  Result := LOut;
+end;
+
+function TClassificacaoTributariaOutput.Codigo: string;
+begin
+  Result := fpCodigo;
+end;
+
+function TClassificacaoTributariaOutput.Descricao: string;
+begin
+  Result := fpDescricao;
+end;
+
+function TClassificacaoTributariaOutput.TipoAliquota: string;
+begin
+  Result := fpTipoAliquota;
+end;
+
+function TClassificacaoTributariaOutput.Nomenclatura: string;
+begin
+  Result := fpNomenclatura;
+end;
+
+function TClassificacaoTributariaOutput.DescricaoTratamentoTributario: string;
+begin
+  Result := fpDescricaoTratamentoTributario;
+end;
+
+function TClassificacaoTributariaOutput.IncompativelComSuspensao: Boolean;
+begin
+  Result := fpIncompativelComSuspensao;
+end;
+
+function TClassificacaoTributariaOutput.ExigeGrupoDesoneracao: Boolean;
+begin
+  Result := fpExigeGrupoDesoneracao;
+end;
+
+function TClassificacaoTributariaOutput.PossuiPercentualReducao: Boolean;
+begin
+  Result := fpPossuiPercentualReducao;
+end;
+
+function TClassificacaoTributariaOutput.IndicaApropriacaoCreditoAdquirenteCbs: Boolean;
+begin
+  Result := fpIndicaApropriacaoCreditoAdquirenteCbs;
+end;
+
+function TClassificacaoTributariaOutput.IndicaApropriacaoCreditoAdquirenteIbs: Boolean;
+begin
+  Result := fpIndicaApropriacaoCreditoAdquirenteIbs;
+end;
+
+function TClassificacaoTributariaOutput.IndicaCreditoPresumidoFornecedor: Boolean;
+begin
+  Result := fpIndicaCreditoPresumidoFornecedor;
+end;
+
+function TClassificacaoTributariaOutput.IndicaCreditoPresumidoAdquirente: Boolean;
+begin
+  Result := fpIndicaCreditoPresumidoAdquirente;
+end;
+
+function TClassificacaoTributariaOutput.CreditoOperacaoAntecedente: string;
+begin
+  Result := fpCreditoOperacaoAntecedente;
+end;
+
+function TClassificacaoTributariaOutput.PercentualReducaoCbs: Double;
+begin
+  Result := fpPercentualReducaoCbs;
+end;
+
+function TClassificacaoTributariaOutput.PercentualReducaoIbsUf: Double;
+begin
+  Result := fpPercentualReducaoIbsUf;
+end;
+
+function TClassificacaoTributariaOutput.PercentualReducaoIbsMun: Double;
+begin
+  Result := fpPercentualReducaoIbsMun;
+end;
+
+{ TAliquotaOutput }
+
+class function TAliquotaOutput.New: IAliquotaOutput;
+begin
+  Result := TAliquotaOutput.Create;
+end;
+
+class function TAliquotaOutput.FromJSON(AJson: TJSONData): IAliquotaOutput;
+var
+  LObj: TJSONObject;
+  LOut: TAliquotaOutput;
+begin
+  LOut := TAliquotaOutput.Create;
+  if (AJson <> nil) and (AJson.JSONType = jtObject) then
+  begin
+    LObj := TJSONObject(AJson);
+    LOut.fpAliquotaReferencia := JSONGetFloat(LObj, 'aliquotaReferencia');
+    LOut.fpAliquotaPropria := JSONGetFloat(LObj, 'aliquotaPropria');
+    LOut.fpFormaAplicacao := JSONGetString(LObj, 'formaAplicacao', '');
+  end;
+  Result := LOut;
+end;
+
+function TAliquotaOutput.AliquotaReferencia: Double;
+begin
+  Result := fpAliquotaReferencia;
+end;
+
+function TAliquotaOutput.AliquotaPropria: Double;
+begin
+  Result := fpAliquotaPropria;
+end;
+
+function TAliquotaOutput.FormaAplicacao: string;
+begin
+  Result := fpFormaAplicacao;
 end;
 
 end.
+

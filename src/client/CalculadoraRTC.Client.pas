@@ -12,12 +12,9 @@ uses
   CalculadoraRTC.Utils.JSON,
   CalculadoraRTC.Utils.Payload,
   CalculadoraRTC.Utils.Logging,
-  CalculadoraRTC.Utils.Net,
   CalculadoraRTC.Schemas.ROC.Core,
   CalculadoraRTC.Schemas.ROC.Inputs,
-  CalculadoraRTC.Schemas.BaseCalculo,
-  CalculadoraRTC.Schemas.Pedagio,
-  CalculadoraRTC.Schemas.DadosAbertos;
+  CalculadoraRTC.Schemas.Pedagio;
 
 type
   ECalculadoraRTC = class(Exception);
@@ -44,7 +41,7 @@ type
     procedure ClearLastResponse;
     function ParseJsonText(const AText: string): TJSONData;
 
-    function DoPostJSON(const APath: string; const ABody: TJSONObject; out AStatus: Integer): TJSONData;
+    function DoPostJSON(const APath: string; const ABody: TJSONObject): TJSONData;
     function DoGetJSON(const ARelPathAndQuery: string): TJSONData;
 
   public
@@ -56,13 +53,14 @@ type
     function UserAgent(const AValue: string): TCalculadoraRTCClient;
     function Logger(const ALogger: ICalcLogger): TCalculadoraRTCClient;
 
-    function CalcularRegimeGeralJSON(const AOperacao: TOperacaoInput): TJSONData;
-    function CalcularRegimeGeral(const AOperacao: TOperacaoInput): TROC;
+    function CalcularRegimeGeralJSON(const AOperacao: IOperacaoInput): TJSONData;
+    function CalcularRegimeGeral(const AOperacao: IOperacaoInput): IROC;
 
     function CalcularISMercadorias(const AInputJson: TJSONObject): TJSONData;
     function CalcularCibs(const AInputJson: TJSONObject): TJSONData;
 
-    function CalcularPedagio(const AInputJson: TJSONObject): TJSONData;
+    function CalcularPedagioJSON(const AInputJson: TJSONObject): TJSONData;
+    function CalcularPedagio(const AInputJson: TJSONObject): ITributoPedagioOutput;
 
     function ValidarXml(const ATipo: string; const ASubtipo: string; const AXml: string): Boolean;
     function GerarXml(const ARocJson: TJSONObject): string;
@@ -171,7 +169,8 @@ begin
   Result := GetJSONExt(AText, True);
 end;
 
-function TCalculadoraRTCClient.DoPostJSON(const APath: string; const ABody: TJSONObject; out AStatus: Integer): TJSONData;
+function TCalculadoraRTCClient.DoPostJSON(const APath: string;
+  const ABody: TJSONObject): TJSONData;
 var
   LResponse: IResponse;
   LUrl: string;
@@ -180,7 +179,7 @@ var
   LDetail: string;
 begin
   Result := nil;
-  AStatus := 0;
+  fpLastStatus := 0;
 
   ClearLastResponse;
 
@@ -202,8 +201,7 @@ begin
       .AddBody(LBodyToSend, False)
       .Post;
 
-    AStatus := LResponse.StatusCode;
-    fpLastStatus := AStatus;
+    fpLastStatus := LResponse.StatusCode;
     fpLastResponseText := LResponse.Content;
 
     fpLastAppVersion := LResponse.Headers.Values['X-CALC-APP-VERSION'];
@@ -211,11 +209,11 @@ begin
 
     if Assigned(fpLogger) then
     begin
-      fpLogger.LogText(Format('HTTP %d', [AStatus]));
+      fpLogger.LogText(Format('HTTP %d', [fpLastStatus]));
       fpLogger.LogText(fpLastResponseText);
     end;
 
-    if (AStatus div 100) <> 2 then
+    if (fpLastStatus div 100) <> 2 then
     begin
       LDetail := '';
       try
@@ -230,11 +228,11 @@ begin
 
       if LDetail <> '' then
       begin
-        raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [AStatus, LDetail]);
+        raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [fpLastStatus, LDetail]);
       end
       else
       begin
-        raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [AStatus, fpLastResponseText]);
+        raise ECalculadoraRTC.CreateFmt('HTTP %d: %s', [fpLastStatus, fpLastResponseText]);
       end;
     end;
 
@@ -311,35 +309,24 @@ end;
 
 {=== Endpoints ===}
 
-function TCalculadoraRTCClient.CalcularRegimeGeralJSON(const AOperacao: TOperacaoInput): TJSONData;
-var
-  LStatus: Integer;
+function TCalculadoraRTCClient.CalcularRegimeGeralJSON(const AOperacao: IOperacaoInput): TJSONData;
 begin
-  Result := DoPostJSON('calculadora/regime-geral', AOperacao.ToJSON, LStatus);
+  Result := DoPostJSON('calculadora/regime-geral', AOperacao.ToJSON);
 end;
 
-function TCalculadoraRTCClient.CalcularRegimeGeral(const AOperacao: TOperacaoInput): TROC;
-var
-  LJson: TJSONData;
-  LStatus: Integer;
+function TCalculadoraRTCClient.CalcularRegimeGeral(const AOperacao: IOperacaoInput): IROC;
 begin
-  LJson := DoPostJSON('calculadora/regime-geral', AOperacao.ToJSON, LStatus);
-  try
-    Result := TROC.FromJSON(fpLastResponseJSON);
-  finally
-    LJson.Free;
-  end;
+  Result := TROC.FromJSON(CalcularRegimeGeralJSON(AOperacao));
 end;
 
 function TCalculadoraRTCClient.CalcularISMercadorias(const AInputJson: TJSONObject): TJSONData;
 var
-  LStatus: Integer;
   LBody: TJSONObject;
 begin
   LBody := TJSONObject(AInputJson.Clone);
   try
     NormalizeISBasePayload(LBody);
-    Result := DoPostJSON('calculadora/base-calculo/is-mercadorias', LBody, LStatus);
+    Result := DoPostJSON('calculadora/base-calculo/is-mercadorias', LBody);
   finally
     LBody.Free;
   end;
@@ -347,23 +334,27 @@ end;
 
 function TCalculadoraRTCClient.CalcularCibs(const AInputJson: TJSONObject): TJSONData;
 var
-  LStatus: Integer;
   LBody: TJSONObject;
 begin
   LBody := TJSONObject(AInputJson.Clone);
   try
     NormalizeCibsBasePayload(LBody);
-    Result := DoPostJSON('calculadora/base-calculo/cbs-ibs-mercadorias', LBody, LStatus);
+    Result := DoPostJSON('calculadora/base-calculo/cbs-ibs-mercadorias', LBody);
   finally
     LBody.Free;
   end;
 end;
 
-function TCalculadoraRTCClient.CalcularPedagio(const AInputJson: TJSONObject): TJSONData;
-var
-  LStatus: Integer;
+function TCalculadoraRTCClient.CalcularPedagioJSON(const AInputJson: TJSONObject
+  ): TJSONData;
 begin
-  Result := DoPostJSON('calculadora/pedagio', AInputJson, LStatus);
+  Result := DoPostJSON('calculadora/pedagio', AInputJson);
+end;
+
+function TCalculadoraRTCClient.CalcularPedagio(const AInputJson: TJSONObject
+  ): ITributoPedagioOutput;
+begin
+  Result := TTributoPedagioOutput.FromJSON(TJSONObject(CalcularPedagioJSON(AInputJson)));
 end;
 
 function TCalculadoraRTCClient.ValidarXml(const ATipo: string; const ASubtipo: string; const AXml: string): Boolean;

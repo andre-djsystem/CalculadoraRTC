@@ -260,22 +260,21 @@ end;
 
 procedure TFormCalcDemo.btnCalcularRegimeGeralJSONClick(Sender: TObject);
 var
-  LInput: TOperacaoInput;
-  LItem: TItemOperacaoInput;
+  LOperacaoInput: IOperacaoInput;
+  LItemOperacaoInput: IItemOperacaoInput;
   LResp: TJSONData;
 begin
   ApplyConfig;
   try
-    LInput := TOperacaoInput.Create;
-    try
-      LInput.Id(edtId.Text)
+      LOperacaoInput := TOperacaoInput.New
+            .Id(edtId.Text)
             .Versao(edtVersao.Text)
             .DataHoraEmissaoISO(DateTimeToISO8601TZ(Now, 0))
             .Municipio(StrToInt64Safe(edtMunicipio.Text))
             .UF(edtUF.Text);
 
-      LItem := LInput.AddItem;
-      LItem.Numero(1)
+      LItemOperacaoInput := LOperacaoInput.AddItem;
+      LItemOperacaoInput.Numero(1)
            .CClassTrib(edtCClassTribItem.Text)
            .CST(edtCSTItem.Text)
            .BaseCalculo(StrToDblSafe(edtBaseCalculoItem.Text))
@@ -283,19 +282,17 @@ begin
            .Unidade(edtUnItem.Text);
 
       if edtNCM.Text <> '' then
-        LItem.NCM(edtNCM.Text)
+        LItemOperacaoInput.NCM(edtNCM.Text)
       else if edtNBS.Text <> '' then
-        LItem.NBS(edtNBS.Text);
+        LItemOperacaoInput.NBS(edtNBS.Text);
 
-      LResp := fpClient.CalcularRegimeGeralJSON(LInput);
+      LResp := fpClient.CalcularRegimeGeralJSON(LOperacaoInput);
       try
         LogJSON('Regime Geral (RAW)', LResp);
       finally
         LResp.Free;
       end;
-    finally
-      LInput.Free;
-    end;
+
   except
     on E: Exception do LogError(E);
   end;
@@ -303,20 +300,20 @@ end;
 
 procedure TFormCalcDemo.btnCalcularRegimeGeralTipadoClick(Sender: TObject);
 var
-  LInput: TOperacaoInput;
-  LROC: TROC;
+  LOperacaoInput: IOperacaoInput;
+  LROC: IROC;
 begin
   ApplyConfig;
   try
-    LInput := TOperacaoInput.Create;
-    try
-      LInput.Id(edtId.Text)
+
+     LOperacaoInput := TOperacaoInput.New
+            .Id(edtId.Text)
             .Versao(edtVersao.Text)
             .DataHoraEmissaoISO(DateTimeToISO8601TZ(Now, 0))
             .Municipio(StrToInt64Safe(edtMunicipio.Text))
             .UF(edtUF.Text);
 
-      with LInput.AddItem do
+      with LOperacaoInput.AddItem do
       begin
         Numero(1);
         CClassTrib(edtCClassTribItem.Text);
@@ -330,16 +327,9 @@ begin
           NBS(edtNBS.Text);
       end;
 
-      LROC := fpClient.CalcularRegimeGeral(LInput);
-      try
-        MemoROC.Lines.Text := LROC.total.tribCalc.IBSCBSTot.vBCIBSCBS.ToString;
-        LogOk('Regime Geral (Tipado)');
-      finally
-        LROC.Free;
-      end;
-    finally
-      LInput.Free;
-    end;
+      LROC := fpClient.CalcularRegimeGeral(LOperacaoInput);
+      MemoROC.Lines.Text := LROC.total.tribCalc.IBSCBSTot.vBCIBSCBS.ToString;
+      LogOk('Regime Geral (Tipado)');
   except
     on E: Exception do LogError(E);
   end;
@@ -347,31 +337,29 @@ end;
 
 procedure TFormCalcDemo.btnBaseISClick(Sender: TObject);
 var
-  LIn: TBaseCalculoISMercadoriasInput;
+  LCalcISBaseInput: ICalcISBaseInput;
   LJson: TJSONObject;
   LResp: TJSONData;
 begin
   ApplyConfig;
   try
-    LIn := TBaseCalculoISMercadoriasInput.Create;
-    try
-      LIn.ValorIntegralCobrado(StrToDblSafe(edtBaseCalculoItem.Text));
+    LCalcISBaseInput :=
+      TBaseCalculoISMercadoriasInput.New
+        .ValorIntegralCobrado(StrToDblSafe(edtBaseCalculoItem.Text));
 
-      LJson := LIn.ToJSON;
+    LJson := LCalcISBaseInput.ToJSON;
+    try
+      NormalizeISBasePayload(LJson);
+      LResp := fpClient.CalcularISMercadorias(LJson);
       try
-        NormalizeISBasePayload(LJson);
-        LResp := fpClient.CalcularISMercadorias(LJson);
-        try
-          LogJSON('Base de Cálculo (IS – RAW)', LResp);
-        finally
-          LResp.Free;
-        end;
+        LogJSON('Base de Cálculo (IS – RAW)', LResp);
       finally
-        LJson.Free;
+        LResp.Free;
       end;
     finally
-      LIn.Free;
+      LJson.Free;
     end;
+
   except
     on E: Exception do LogError(E);
   end;
@@ -379,68 +367,65 @@ end;
 
 procedure TFormCalcDemo.btnBaseCIBSClick(Sender: TObject);
 var
-  LIn: TBaseCalculoCibsInput;
+  LCalcCibsBaseInput: ICalcCibsBaseInput;
   LJson: TJSONObject;
   LResp: TJSONData;
 begin
   ApplyConfig;
-  try
-    LIn := TBaseCalculoCibsInput.Create;
-    try
-      LIn.ValorFornecimento(StrToDblSafe(edtBaseCalculoItem.Text));
 
-      LJson := LIn.ToJSON;
+  LCalcCibsBaseInput :=
+    TBaseCalculoCibsInput.New
+      .ValorFornecimento(StrToDblSafe(edtBaseCalculoItem.Text));
+  try
+    LJson := LCalcCibsBaseInput.ToJSON;
+    try
+      NormalizeCibsBasePayload(LJson);
+      LResp := fpClient.CalcularCibs(LJson);
       try
-        NormalizeCibsBasePayload(LJson);
-        LResp := fpClient.CalcularCibs(LJson);
-        try
-          LogJSON('Base de Cálculo (CBS/IBS – RAW)', LResp);
-        finally
-          LResp.Free;
-        end;
+        LogJSON('Base de Cálculo (CBS/IBS – RAW)', LResp);
       finally
-        LJson.Free;
+        LResp.Free;
       end;
     finally
-      LIn.Free;
+      LJson.Free;
     end;
-  except
-    on E: Exception do LogError(E);
-  end;
+
+except
+  on E: Exception do LogError(E);
+end;
 end;
 
 procedure TFormCalcDemo.btnPedagioClick(Sender: TObject);
 var
-  LIn: TPedagioInput;
-  LT: TTrechoPedagioInput;
+  LPedagioInput: IPedagioInput;
+  LTrechoPedagioInput: ITrechoPedagioInput;
   LResp: TJSONData;
 begin
   ApplyConfig;
   try
-    LIn := TPedagioInput.Create;
-    try
-      LIn.DataHoraEmissaoISO(DateTimeToISO8601TZ(Now, 0))
+
+      LPedagioInput := TPedagioInput.New
+         .DataHoraEmissaoISO(DateTimeToISO8601TZ(Now, 0))
          .CodigoMunicipioOrigem(StrToInt64Safe(edtCodigoMunicipio.Text))
          .UFMunicipioOrigem(edtUF.Text)
          .CST(edtCSTItem.Text)
          .BaseCalculo(StrToDblSafe(edtBaseCalculoItem.Text))
          .CClassTrib(edtCClassTribItem.Text);
 
-      LT := LIn.AddTrecho;
-      LT.Numero(1)
-        .CodigoMunicipio(StrToInt64Safe(edtCodigoMunicipio.Text))
+      LTrechoPedagioInput := LPedagioInput.AddTrecho;
+      LTrechoPedagioInput
+        .Numero(1)
+        .Municipio(StrToInt64Safe(edtCodigoMunicipio.Text))
         .UF(edtUF.Text)
         .Extensao(10.0);
 
-      LResp := fpClient.CalcularPedagio(LIn.ToJSON);
+      LResp := fpClient.CalcularPedagioJSON(LPedagioInput.ToJSON);
       try
         LogJSON('Pedágio (RAW)', LResp);
       finally
         LResp.Free;
       end;
-    finally
-      LIn.Free;
-    end;
+
   except
     on E: Exception do LogError(E);
   end;
@@ -508,18 +493,17 @@ end;
 procedure TFormCalcDemo.btnVersaoClick(Sender: TObject);
 var
   D: TJSONData;
-  LVersao: TVersaoInfo;
+  LVersao: IVersaoOutput;
 begin
   ApplyConfig;
   try
     D := fpClient.ConsultarVersao;
-    LVersao := TVersaoInfo.FromJSON(TJSONObject(D));
+    LVersao := TVersaoOutput.FromJSON(TJSONObject(D));
     try
       LogJSON('Versão', D);
-      MemoROC.Lines.Add(LVersao.AppVersion);
+      MemoROC.Lines.Add(LVersao.VersaoApp);
     finally
       D.Free;
-      LVersao.Free;
     end;
   except
     on E: Exception do LogError(E);
@@ -546,12 +530,15 @@ end;
 procedure TFormCalcDemo.btnMunicipiosUFClick(Sender: TObject);
 var
   D: TJSONData;
+  LListaMun: TListaMunicipio;
 begin
   ApplyConfig;
   try
     D := fpClient.ConsultarMunicipiosPorSiglaUf(edtSiglaUF.Text);
     try
+      LListaMun := ParseListaMunicipio(D);
       LogJSON('Municípios por UF', D);
+      MemoROC.Lines.Add(Format('Total de Municípios: %d',[LListaMun.Count]));
     finally
       D.Free;
     end;

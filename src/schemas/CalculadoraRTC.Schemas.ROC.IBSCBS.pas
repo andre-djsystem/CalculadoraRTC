@@ -5,80 +5,203 @@ unit CalculadoraRTC.Schemas.ROC.IBSCBS;
 interface
 
 uses
-  Classes, SysUtils,
-  fpjson,
+  Classes, SysUtils, fpjson,
   CalculadoraRTC.Utils.JSON;
 
 type
-  TDiferimento = class
+  IROCDiferimento = interface
+    ['{8C1F6F65-7D4A-4B75-9A3C-2B8B0C4E0D11}']
+    function PDif: Double; // pDif
+    function VDif: Double; // vDif
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCDevolucaoTributos = interface
+    ['{6E0D4B5B-386C-4F0E-9D8E-AD5D7B3A0F20}']
+    function VDevTrib: Double; // vDevTrib
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCReducaoAliquota = interface
+    ['{C6F794D3-1C71-4C1E-88E5-DF31C9D57F05}']
+    function PRedAliq: Double;  // pRedAliq
+    function PAliqEfet: Double; // pAliqEfet
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCCreditoPresumido = interface
+    ['{0A6A64D0-2F68-4A8B-8B31-4C6B0E8E20C3}']
+    function CCredPres: Integer;       // cCredPres
+    function PCredPres: Double;        // pCredPres
+    function VCredPres: Double;        // vCredPres
+    function VCredPresCondSus: Double; // vCredPresCondSus
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCCreditoPresumidoIBSZFM = interface
+    ['{8E9941F7-8750-494D-9111-069AD0E9E8B9}']
+    function TpCredPresIBSZFM: Integer; // tpCredPresIBSZFM
+    function VCredPresIBSZFM: Double;   // vCredPresIBSZFM
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCTransferenciaCredito = interface
+    ['{F5AA7F1F-5C4D-4F9E-A8E4-5B0D7B7AE2F2}']
+    function VIBS: Double; // vIBS
+    function VCBS: Double; // vCBS
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCTributacaoCompraGovernamental = interface
+    ['{0B7C0D1A-8B9A-4B2A-8CFF-1D4A4F7E3193}']
+    function PAliqIBSUF: Double;   // pAliqIBSUF
+    function VTribIBSUF: Double;   // vTribIBSUF
+    function PAliqIBSMun: Double;  // pAliqIBSMun
+    function VTribIBSMun: Double;  // vTribIBSMun
+    function PAliqCBS: Double;     // pAliqCBS
+    function VTribCBS: Double;     // vTribCBS
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCIBSUF = interface
+    ['{E2B5F8A1-9F02-4C34-9B26-9B0C5E22C4E1}']
+    function PIBSUF: Double;                         // pIBSUF
+    function GDif: IROCDiferimento;                  // gDif
+    function GDevTrib: IROCDevolucaoTributos;        // gDevTrib
+    function GRed: IROCReducaoAliquota;              // gRed
+    function VIBSUF: Double;                         // vIBSUF
+    function MemoriaCalculo: string;                 // memoriaCalculo
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCIBSMun = interface
+    ['{B6F4B0CF-57A5-4F5C-A6F1-59C63C99A1D8}']
+    function PIBSMun: Double;                        // pIBSMun
+    function GDif: IROCDiferimento;                  // gDif
+    function GDevTrib: IROCDevolucaoTributos;        // gDevTrib
+    function GRed: IROCReducaoAliquota;              // gRed
+    function VIBSMun: Double;                        // vIBSMun
+    function MemoriaCalculo: string;                 // memoriaCalculo
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCCBS = interface
+    ['{3D8C5A2D-7F2E-4AA5-8B9C-4B7E0E5AA25E}']
+    function PCBS: Double;                           // pCBS
+    function GDif: IROCDiferimento;                  // gDif
+    function GDevTrib: IROCDevolucaoTributos;        // gDevTrib
+    function GRed: IROCReducaoAliquota;              // gRed
+    function VCBS: Double;                           // vCBS
+    function MemoriaCalculo: string;                 // memoriaCalculo
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCGrupoIBSCBS = interface
+    ['{4A6F8A1B-4E10-4C5F-8A3F-EE0F2B9D62E6}']
+    function VBC: Double;                                     // vBC
+    function GIBSUF: IROCIBSUF;                               // gIBSUF
+    function GIBSMun: IROCIBSMun;                             // gIBSMun
+    function GCBS: IROCCBS;                                   // gCBS
+    function GIBSCredPres: IROCCreditoPresumido;              // gIBSCredPres
+    function GCBSCredPres: IROCCreditoPresumido;              // gCBSCredPres
+    function GTribCompraGov: IROCTributacaoCompraGovernamental;// gTribCompraGov
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCMonofasia = interface
+    ['{8F5D6D28-24D0-4D7B-87D6-24C38C6A2A77}']
+    function QBCMono: Double;        // qBCMono
+    function AdRemIBS: Double;       // adRemIBS
+    function AdRemCBS: Double;       // adRemCBS
+    function VIBSMono: Double;       // vIBSMono
+    function VCBSMono: Double;       // vCBSMono
+    function VIBSMonoDif: Double;    // vIBSMonoDif
+    function VCBSMonoDif: Double;    // vCBSMonoDif
+    function VTotIBSMonoItem: Double;// vTotIBSMonoItem
+    function VTotCBSMonoItem: Double;// vTotCBSMonoItem
+    function ToJSON: TJSONObject;
+  end;
+
+  IROCIBSCBS = interface
+    ['{3C8B7E61-EB0A-4B6A-8D5A-1A31C3F3E66B}']
+    function CST: Integer;                              // CST (pode vir "000" em string na API; convertemos)
+    function CClassTrib: string;                        // cClassTrib
+    function GIBSCBS: IROCGrupoIBSCBS;                  // gIBSCBS
+    function GIBSCBSMono: IROCMonofasia;                // gIBSCBSMono
+    function GTransfCred: IROCTransferenciaCredito;     // gTransfCred
+    function GCredPresIBSZFM: IROCCreditoPresumidoIBSZFM;// gCredPresIBSZFM
+    function ToJSON: TJSONObject;
+  end;
+
+  TROC_Diferimento = class(TInterfacedObject, IROCDiferimento)
   private
     fpPDif: Double;
     fpVDif: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TDiferimento; static;
-
-    property pDif: Double read fpPDif write fpPDif;
-    property vDif: Double read fpVDif write fpVDif;
+    class function FromJSON(AObj: TJSONObject): IROCDiferimento; static;
+    function PDif: Double;
+    function VDif: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TDevolucaoTributos = class
+  TROC_DevTrib = class(TInterfacedObject, IROCDevolucaoTributos)
   private
     fpVDevTrib: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TDevolucaoTributos; static;
-
-    property vDevTrib: Double read fpVDevTrib write fpVDevTrib;
+    class function FromJSON(AObj: TJSONObject): IROCDevolucaoTributos; static;
+    function VDevTrib: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TReducaoAliquota = class
+  TROC_ReducaoAliq = class(TInterfacedObject, IROCReducaoAliquota)
   private
     fpPRedAliq: Double;
     fpPAliqEfet: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TReducaoAliquota; static;
-
-    property pRedAliq: Double read fpPRedAliq write fpPRedAliq;
-    property pAliqEfet: Double read fpPAliqEfet write fpPAliqEfet;
+    class function FromJSON(AObj: TJSONObject): IROCReducaoAliquota; static;
+    function PRedAliq: Double;
+    function PAliqEfet: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TCreditoPresumido = class
+  TROC_CredPres = class(TInterfacedObject, IROCCreditoPresumido)
   private
     fpCCredPres: Integer;
     fpPCredPres: Double;
     fpVCredPres: Double;
     fpVCredPresCondSus: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TCreditoPresumido; static;
-
-    property cCredPres: Integer read fpCCredPres write fpCCredPres;
-    property pCredPres: Double read fpPCredPres write fpPCredPres;
-    property vCredPres: Double read fpVCredPres write fpVCredPres;
-    property vCredPresCondSus: Double read fpVCredPresCondSus write fpVCredPresCondSus;
+    class function FromJSON(AObj: TJSONObject): IROCCreditoPresumido; static;
+    function CCredPres: Integer;
+    function PCredPres: Double;
+    function VCredPres: Double;
+    function VCredPresCondSus: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TCreditoPresumidoIBSZFM = class
+  TROC_CredPresIBSZFM = class(TInterfacedObject, IROCCreditoPresumidoIBSZFM)
   private
     fpTpCredPresIBSZFM: Integer;
     fpVCredPresIBSZFM: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TCreditoPresumidoIBSZFM; static;
-
-    property tpCredPresIBSZFM: Integer read fpTpCredPresIBSZFM write fpTpCredPresIBSZFM;
-    property vCredPresIBSZFM: Double read fpVCredPresIBSZFM write fpVCredPresIBSZFM;
+    class function FromJSON(AObj: TJSONObject): IROCCreditoPresumidoIBSZFM; static;
+    function TpCredPresIBSZFM: Integer;
+    function VCredPresIBSZFM: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TTransferenciaCredito = class
+  TROC_TransfCred = class(TInterfacedObject, IROCTransferenciaCredito)
   private
     fpVIBS: Double;
     fpVCBS: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TTransferenciaCredito; static;
-
-    property vIBS: Double read fpVIBS write fpVIBS;
-    property vCBS: Double read fpVCBS write fpVCBS;
+    class function FromJSON(AObj: TJSONObject): IROCTransferenciaCredito; static;
+    function VIBS: Double;
+    function VCBS: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TTributacaoCompraGovernamental = class
+  TROC_TribCompraGov = class(TInterfacedObject, IROCTributacaoCompraGovernamental)
   private
     fpPAliqIBSUF: Double;
     fpVTribIBSUF: Double;
@@ -87,102 +210,95 @@ type
     fpPAliqCBS: Double;
     fpVTribCBS: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TTributacaoCompraGovernamental; static;
-
-    property pAliqIBSUF: Double read fpPAliqIBSUF write fpPAliqIBSUF;
-    property vTribIBSUF: Double read fpVTribIBSUF write fpVTribIBSUF;
-    property pAliqIBSMun: Double read fpPAliqIBSMun write fpPAliqIBSMun;
-    property vTribIBSMun: Double read fpVTribIBSMun write fpVTribIBSMun;
-    property pAliqCBS: Double read fpPAliqCBS write fpPAliqCBS;
-    property vTribCBS: Double read fpVTribCBS write fpVTribCBS;
+    class function FromJSON(AObj: TJSONObject): IROCTributacaoCompraGovernamental; static;
+    function PAliqIBSUF: Double;
+    function VTribIBSUF: Double;
+    function PAliqIBSMun: Double;
+    function VTribIBSMun: Double;
+    function PAliqCBS: Double;
+    function VTribCBS: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TIBSUF = class
+  TROC_IBSUF = class(TInterfacedObject, IROCIBSUF)
   private
     fpPIBSUF: Double;
-    fpgDif: TDiferimento;
-    fpgDevTrib: TDevolucaoTributos;
-    fpgRed: TReducaoAliquota;
+    fpGDif: IROCDiferimento;
+    fpGDevTrib: IROCDevolucaoTributos;
+    fpGRed: IROCReducaoAliquota;
     fpVIBSUF: Double;
     fpMemoriaCalculo: string;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TIBSUF; static;
-
-    property pIBSUF: Double read fpPIBSUF write fpPIBSUF;
-    property gDif: TDiferimento read fpgDif write fpgDif;
-    property gDevTrib: TDevolucaoTributos read fpgDevTrib write fpgDevTrib;
-    property gRed: TReducaoAliquota read fpgRed write fpgRed;
-    property vIBSUF: Double read fpVIBSUF write fpVIBSUF;
-    property memoriaCalculo: string read fpMemoriaCalculo write fpMemoriaCalculo;
+    class function FromJSON(AObj: TJSONObject): IROCIBSUF; static;
+    function PIBSUF: Double;
+    function GDif: IROCDiferimento;
+    function GDevTrib: IROCDevolucaoTributos;
+    function GRed: IROCReducaoAliquota;
+    function VIBSUF: Double;
+    function MemoriaCalculo: string;
+    function ToJSON: TJSONObject;
   end;
 
-  TIBSMun = class
+  TROC_IBSMun = class(TInterfacedObject, IROCIBSMun)
   private
     fpPIBSMun: Double;
-    fpgDif: TDiferimento;
-    fpgDevTrib: TDevolucaoTributos;
-    fpgRed: TReducaoAliquota;
+    fpGDif: IROCDiferimento;
+    fpGDevTrib: IROCDevolucaoTributos;
+    fpGRed: IROCReducaoAliquota;
     fpVIBSMun: Double;
     fpMemoriaCalculo: string;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TIBSMun; static;
-
-    property pIBSMun: Double read fpPIBSMun write fpPIBSMun;
-    property gDif: TDiferimento read fpgDif write fpgDif;
-    property gDevTrib: TDevolucaoTributos read fpgDevTrib write fpgDevTrib;
-    property gRed: TReducaoAliquota read fpgRed write fpgRed;
-    property vIBSMun: Double read fpVIBSMun write fpVIBSMun;
-    property memoriaCalculo: string read fpMemoriaCalculo write fpMemoriaCalculo;
+    class function FromJSON(AObj: TJSONObject): IROCIBSMun; static;
+    function PIBSMun: Double;
+    function GDif: IROCDiferimento;
+    function GDevTrib: IROCDevolucaoTributos;
+    function GRed: IROCReducaoAliquota;
+    function VIBSMun: Double;
+    function MemoriaCalculo: string;
+    function ToJSON: TJSONObject;
   end;
 
-  TCBS = class
+  TROC_CBS = class(TInterfacedObject, IROCCBS)
   private
     fpPCBS: Double;
-    fpgDif: TDiferimento;
-    fpgDevTrib: TDevolucaoTributos;
-    fpgRed: TReducaoAliquota;
+    fpGDif: IROCDiferimento;
+    fpGDevTrib: IROCDevolucaoTributos;
+    fpGRed: IROCReducaoAliquota;
     fpVCBS: Double;
     fpMemoriaCalculo: string;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TCBS; static;
-
-    property pCBS: Double read fpPCBS write fpPCBS;
-    property gDif: TDiferimento read fpgDif write fpgDif;
-    property gDevTrib: TDevolucaoTributos read fpgDevTrib write fpgDevTrib;
-    property gRed: TReducaoAliquota read fpgRed write fpgRed;
-    property vCBS: Double read fpVCBS write fpVCBS;
-    property memoriaCalculo: string read fpMemoriaCalculo write fpMemoriaCalculo;
+    class function FromJSON(AObj: TJSONObject): IROCCBS; static;
+    function PCBS: Double;
+    function GDif: IROCDiferimento;
+    function GDevTrib: IROCDevolucaoTributos;
+    function GRed: IROCReducaoAliquota;
+    function VCBS: Double;
+    function MemoriaCalculo: string;
+    function ToJSON: TJSONObject;
   end;
 
-  {------------------------------------------------------------------------------
-    Grupo com base e subgrupos (ITEM)
-   ------------------------------------------------------------------------------}
-  TGrupoIBSCBS = class
+  TROC_GrupoIBSCBS = class(TInterfacedObject, IROCGrupoIBSCBS)
   private
     fpVBC: Double;
-    fpgIBSUF: TIBSUF;
-    fpgIBSMun: TIBSMun;
-    fpgCBS: TCBS;
-    fpgIBSCredPres: TCreditoPresumido;
-    fpgCBSCredPres: TCreditoPresumido;
-    fpgTribCompraGov: TTributacaoCompraGovernamental;
+    fpGIBSUF: IROCIBSUF;
+    fpGIBSMun: IROCIBSMun;
+    fpGCBS: IROCCBS;
+    fpGIBSCredPres: IROCCreditoPresumido;
+    fpGCBSCredPres: IROCCreditoPresumido;
+    fpGTribCompraGov: IROCTributacaoCompraGovernamental;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TGrupoIBSCBS; static;
-
-    property vBC: Double read fpVBC write fpVBC;
-    property gIBSUF: TIBSUF read fpgIBSUF write fpgIBSUF;
-    property gIBSMun: TIBSMun read fpgIBSMun write fpgIBSMun;
-    property gCBS: TCBS read fpgCBS write fpgCBS;
-    property gIBSCredPres: TCreditoPresumido read fpgIBSCredPres write fpgIBSCredPres;
-    property gCBSCredPres: TCreditoPresumido read fpgCBSCredPres write fpgCBSCredPres;
-    property gTribCompraGov: TTributacaoCompraGovernamental read fpgTribCompraGov write fpgTribCompraGov;
+    class function FromJSON(AObj: TJSONObject): IROCGrupoIBSCBS; static;
+    function VBC: Double;
+    function GIBSUF: IROCIBSUF;
+    function GIBSMun: IROCIBSMun;
+    function GCBS: IROCCBS;
+    function GIBSCredPres: IROCCreditoPresumido;
+    function GCBSCredPres: IROCCreditoPresumido;
+    function GTribCompraGov: IROCTributacaoCompraGovernamental;
+    function ToJSON: TJSONObject;
   end;
 
-  TMonofasia = class
+  TROC_Monofasia = class(TInterfacedObject, IROCMonofasia)
   private
     fpQBCMono: Double;
     fpAdRemIBS: Double;
@@ -194,517 +310,714 @@ type
     fpVTotIBSMonoItem: Double;
     fpVTotCBSMonoItem: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TMonofasia; static;
-
-    property qBCMono: Double read fpQBCMono write fpQBCMono;
-    property adRemIBS: Double read fpAdRemIBS write fpAdRemIBS;
-    property adRemCBS: Double read fpAdRemCBS write fpAdRemCBS;
-    property vIBSMono: Double read fpVIBSMono write fpVIBSMono;
-    property vCBSMono: Double read fpVCBSMono write fpVCBSMono;
-    property vIBSMonoDif: Double read fpVIBSMonoDif write fpVIBSMonoDif;
-    property vCBSMonoDif: Double read fpVCBSMonoDif write fpVCBSMonoDif;
-    property vTotIBSMonoItem: Double read fpVTotIBSMonoItem write fpVTotIBSMonoItem;
-    property vTotCBSMonoItem: Double read fpVTotCBSMonoItem write fpVTotCBSMonoItem;
+    class function FromJSON(AObj: TJSONObject): IROCMonofasia; static;
+    function QBCMono: Double;
+    function AdRemIBS: Double;
+    function AdRemCBS: Double;
+    function VIBSMono: Double;
+    function VCBSMono: Double;
+    function VIBSMonoDif: Double;
+    function VCBSMonoDif: Double;
+    function VTotIBSMonoItem: Double;
+    function VTotCBSMonoItem: Double;
+    function ToJSON: TJSONObject;
   end;
 
-  TIBSCBS = class
+  TROCIBSCBSGroup = class(TInterfacedObject, IROCIBSCBS)
   private
     fpCST: Integer;
-    fpcClassTrib: string;
-    fpgIBSCBS: TGrupoIBSCBS;
-    fpgIBSCBSMono: TMonofasia;
-    fpgTransfCred: TTransferenciaCredito;
-    fpgCredPresIBSZFM: TCreditoPresumidoIBSZFM;
+    fpCClassTrib: string;
+    fpGIBSCBS: IROCGrupoIBSCBS;
+    fpGIBSCBSMono: IROCMonofasia;
+    fpGTransfCred: IROCTransferenciaCredito;
+    fpGCredPresIBSZFM: IROCCreditoPresumidoIBSZFM;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TIBSCBS; static;
-
-    property CST: Integer read fpCST write fpCST;
-    property cClassTrib: string read fpcClassTrib write fpcClassTrib;
-    property gIBSCBS: TGrupoIBSCBS read fpgIBSCBS write fpgIBSCBS;
-    property gIBSCBSMono: TMonofasia read fpgIBSCBSMono write fpgIBSCBSMono;
-    property gTransfCred: TTransferenciaCredito read fpgTransfCred write fpgTransfCred;
-    property gCredPresIBSZFM: TCreditoPresumidoIBSZFM read fpgCredPresIBSZFM write fpgCredPresIBSZFM;
-  end;
-
-  {------------------------------------------------------------------------------
-    Totais
-   ------------------------------------------------------------------------------}
-  TIBSUFTotal = class
-  private
-    fpVDif: Double;
-    fpVDevTrib: Double;
-    fpVIBSUF: Double;
-  public
-    class function FromJSON(AObj: TJSONObject): TIBSUFTotal; static;
-
-    property vDif: Double read fpVDif write fpVDif;
-    property vDevTrib: Double read fpVDevTrib write fpVDevTrib;
-    property vIBSUF: Double read fpVIBSUF write fpVIBSUF;
-  end;
-
-  TIBSMunTotal = class
-  private
-    fpVDif: Double;
-    fpVDevTrib: Double;
-    fpVIBSMun: Double;
-  public
-    class function FromJSON(AObj: TJSONObject): TIBSMunTotal; static;
-
-    property vDif: Double read fpVDif write fpVDif;
-    property vDevTrib: Double read fpVDevTrib write fpVDevTrib;
-    property vIBSMun: Double read fpVIBSMun write fpVIBSMun;
-  end;
-
-  TIBSTotal = class
-  private
-    fpgIBSUF: TIBSUFTotal;
-    fpgIBSMun: TIBSMunTotal;
-    fpVIBS: Double;
-    fpVCredPres: Double;
-    fpVCredPresCondSus: Double;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TIBSTotal; static;
-
-    property gIBSUF: TIBSUFTotal read fpgIBSUF write fpgIBSUF;
-    property gIBSMun: TIBSMunTotal read fpgIBSMun write fpgIBSMun;
-    property vIBS: Double read fpVIBS write fpVIBS;
-    property vCredPres: Double read fpVCredPres write fpVCredPres;
-    property vCredPresCondSus: Double read fpVCredPresCondSus write fpVCredPresCondSus;
-  end;
-
-  TCBSTotal = class
-  private
-    fpVDif: Double;
-    fpVDevTrib: Double;
-    fpVCBS: Double;
-    fpVCredPres: Double;
-    fpVCredPresCondSus: Double;
-  public
-    class function FromJSON(AObj: TJSONObject): TCBSTotal; static;
-
-    property vDif: Double read fpVDif write fpVDif;
-    property vDevTrib: Double read fpVDevTrib write fpVDevTrib;
-    property vCBS: Double read fpVCBS write fpVCBS;
-    property vCredPres: Double read fpVCredPres write fpVCredPres;
-    property vCredPresCondSus: Double read fpVCredPresCondSus write fpVCredPresCondSus;
-  end;
-
-  TIBSCBSTotal = class
-  private
-    fpVBCIBSCBS: Double;
-    fpgIBS: TIBSTotal;
-    fpgCBS: TCBSTotal;
-  public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TIBSCBSTotal; static;
-
-    property vBCIBSCBS: Double read fpVBCIBSCBS write fpVBCIBSCBS;
-    property gIBS: TIBSTotal read fpgIBS write fpgIBS;
-    property gCBS: TCBSTotal read fpgCBS write fpgCBS;
+    class function FromJSON(AObj: TJSONObject): IROCIBSCBS; static;
+    function CST: Integer;
+    function CClassTrib: string;
+    function GIBSCBS: IROCGrupoIBSCBS;
+    function GIBSCBSMono: IROCMonofasia;
+    function GTransfCred: IROCTransferenciaCredito;
+    function GCredPresIBSZFM: IROCCreditoPresumidoIBSZFM;
+    function ToJSON: TJSONObject;
   end;
 
 implementation
 
-{ TDiferimento }
-
-class function TDiferimento.FromJSON(AObj: TJSONObject): TDiferimento;
-begin
-  Result := TDiferimento.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpPDif := JSONGetFloat(AObj, 'pDif');
-  Result.fpVDif := JSONGetFloat(AObj, 'vDif');
-end;
-
-{ TDevolucaoTributos }
-
-class function TDevolucaoTributos.FromJSON(AObj: TJSONObject): TDevolucaoTributos;
-begin
-  Result := TDevolucaoTributos.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpVDevTrib := JSONGetFloat(AObj, 'vDevTrib');
-end;
-
-{ TReducaoAliquota }
-
-class function TReducaoAliquota.FromJSON(AObj: TJSONObject): TReducaoAliquota;
-begin
-  Result := TReducaoAliquota.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpPRedAliq := JSONGetFloat(AObj, 'pRedAliq');
-  Result.fpPAliqEfet := JSONGetFloat(AObj, 'pAliqEfet');
-end;
-
-{ TCreditoPresumido }
-
-class function TCreditoPresumido.FromJSON(AObj: TJSONObject): TCreditoPresumido;
-begin
-  Result := TCreditoPresumido.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpCCredPres := JSONGetInt(AObj, 'cCredPres');
-  Result.fpPCredPres := JSONGetFloat(AObj, 'pCredPres');
-  Result.fpVCredPres := JSONGetFloat(AObj, 'vCredPres');
-  Result.fpVCredPresCondSus := JSONGetFloat(AObj, 'vCredPresCondSus');
-end;
-
-{ TCreditoPresumidoIBSZFM }
-
-class function TCreditoPresumidoIBSZFM.FromJSON(AObj: TJSONObject): TCreditoPresumidoIBSZFM;
-begin
-  Result := TCreditoPresumidoIBSZFM.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpTpCredPresIBSZFM := JSONGetInt(AObj, 'tpCredPresIBSZFM');
-  Result.fpVCredPresIBSZFM := JSONGetFloat(AObj, 'vCredPresIBSZFM');
-end;
-
-{ TTransferenciaCredito }
-
-class function TTransferenciaCredito.FromJSON(AObj: TJSONObject): TTransferenciaCredito;
-begin
-  Result := TTransferenciaCredito.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpVIBS := JSONGetFloat(AObj, 'vIBS');
-  Result.fpVCBS := JSONGetFloat(AObj, 'vCBS');
-end;
-
-{ TTributacaoCompraGovernamental }
-
-class function TTributacaoCompraGovernamental.FromJSON(AObj: TJSONObject): TTributacaoCompraGovernamental;
-begin
-  Result := TTributacaoCompraGovernamental.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpPAliqIBSUF := JSONGetFloat(AObj, 'pAliqIBSUF');
-  Result.fpVTribIBSUF := JSONGetFloat(AObj, 'vTribIBSUF');
-  Result.fpPAliqIBSMun := JSONGetFloat(AObj, 'pAliqIBSMun');
-  Result.fpVTribIBSMun := JSONGetFloat(AObj, 'vTribIBSMun');
-  Result.fpPAliqCBS := JSONGetFloat(AObj, 'pAliqCBS');
-  Result.fpVTribCBS := JSONGetFloat(AObj, 'vTribCBS');
-end;
-
-{ TIBSUF }
-
-destructor TIBSUF.Destroy;
-begin
-  FreeAndNil(fpgDif);
-  FreeAndNil(fpgDevTrib);
-  FreeAndNil(fpgRed);
-  inherited Destroy;
-end;
-
-class function TIBSUF.FromJSON(AObj: TJSONObject): TIBSUF;
+class function TROC_Diferimento.FromJSON(AObj: TJSONObject): IROCDiferimento;
 var
-  LObj: TJSONObject;
+  L: TROC_Diferimento;
 begin
-  Result := TIBSUF.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpPIBSUF := JSONGetFloat(AObj, 'pIBSUF');
-  Result.fpVIBSUF := JSONGetFloat(AObj, 'vIBSUF');
-  Result.fpMemoriaCalculo := AObj.Get('memoriaCalculo', '');
-
-  LObj := SafeGetObj(AObj, 'gDif');
-  if LObj <> nil then
-    Result.fpgDif := TDiferimento.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gDevTrib');
-  if LObj <> nil then
-    Result.fpgDevTrib := TDevolucaoTributos.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gRed');
-  if LObj <> nil then
-    Result.fpgRed := TReducaoAliquota.FromJSON(LObj);
+  L := TROC_Diferimento.Create;
+  if AObj <> nil then
+  begin
+    L.fpPDif := JSONGetFloat(AObj, 'pDif');
+    L.fpVDif := JSONGetFloat(AObj, 'vDif');
+  end;
+  Result := L;
 end;
 
-{ TIBSMun }
+function TROC_Diferimento.PDif: Double; begin Result := fpPDif; end;
+function TROC_Diferimento.VDif: Double; begin Result := fpVDif; end;
 
-destructor TIBSMun.Destroy;
+function TROC_Diferimento.ToJSON: TJSONObject;
 begin
-  FreeAndNil(fpgDif);
-  FreeAndNil(fpgDevTrib);
-  FreeAndNil(fpgRed);
-  inherited Destroy;
+  Result := TJSONObject.Create;
+  Result.Add('pDif', JFloat(fpPDif));
+  Result.Add('vDif', JFloat(fpVDif));
 end;
 
-class function TIBSMun.FromJSON(AObj: TJSONObject): TIBSMun;
+class function TROC_DevTrib.FromJSON(AObj: TJSONObject): IROCDevolucaoTributos;
 var
-  LObj: TJSONObject;
+  L: TROC_DevTrib;
 begin
-  Result := TIBSMun.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpPIBSMun := JSONGetFloat(AObj, 'pIBSMun');
-  Result.fpVIBSMun := JSONGetFloat(AObj, 'vIBSMun');
-  Result.fpMemoriaCalculo := AObj.Get('memoriaCalculo', '');
-
-  LObj := SafeGetObj(AObj, 'gDif');
-  if LObj <> nil then
-    Result.fpgDif := TDiferimento.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gDevTrib');
-  if LObj <> nil then
-    Result.fpgDevTrib := TDevolucaoTributos.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gRed');
-  if LObj <> nil then
-    Result.fpgRed := TReducaoAliquota.FromJSON(LObj);
+  L := TROC_DevTrib.Create;
+  if AObj <> nil then
+    L.fpVDevTrib := JSONGetFloat(AObj, 'vDevTrib');
+  Result := L;
 end;
 
-{ TCBS }
+function TROC_DevTrib.VDevTrib: Double; begin Result := fpVDevTrib; end;
 
-destructor TCBS.Destroy;
+function TROC_DevTrib.ToJSON: TJSONObject;
 begin
-  FreeAndNil(fpgDif);
-  FreeAndNil(fpgDevTrib);
-  FreeAndNil(fpgRed);
-  inherited Destroy;
+  Result := TJSONObject.Create;
+  Result.Add('vDevTrib', JFloat(fpVDevTrib));
 end;
 
-class function TCBS.FromJSON(AObj: TJSONObject): TCBS;
+class function TROC_ReducaoAliq.FromJSON(AObj: TJSONObject): IROCReducaoAliquota;
 var
-  LObj: TJSONObject;
+  L: TROC_ReducaoAliq;
 begin
-  Result := TCBS.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpPCBS := JSONGetFloat(AObj, 'pCBS');
-  Result.fpVCBS := JSONGetFloat(AObj, 'vCBS');
-  Result.fpMemoriaCalculo := AObj.Get('memoriaCalculo', '');
-
-  LObj := SafeGetObj(AObj, 'gDif');
-  if LObj <> nil then
-    Result.fpgDif := TDiferimento.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gDevTrib');
-  if LObj <> nil then
-    Result.fpgDevTrib := TDevolucaoTributos.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gRed');
-  if LObj <> nil then
-    Result.fpgRed := TReducaoAliquota.FromJSON(LObj);
+  L := TROC_ReducaoAliq.Create;
+  if AObj <> nil then
+  begin
+    L.fpPRedAliq := JSONGetFloat(AObj, 'pRedAliq');
+    L.fpPAliqEfet := JSONGetFloat(AObj, 'pAliqEfet');
+  end;
+  Result := L;
 end;
 
-{ TGrupoIBSCBS }
-
-destructor TGrupoIBSCBS.Destroy;
+function TROC_ReducaoAliq.PRedAliq: Double;
 begin
-  FreeAndNil(fpgIBSUF);
-  FreeAndNil(fpgIBSMun);
-  FreeAndNil(fpgCBS);
-  FreeAndNil(fpgIBSCredPres);
-  FreeAndNil(fpgCBSCredPres);
-  FreeAndNil(fpgTribCompraGov);
-  inherited Destroy;
+  Result := fpPRedAliq;
 end;
 
-class function TGrupoIBSCBS.FromJSON(AObj: TJSONObject): TGrupoIBSCBS;
+function TROC_ReducaoAliq.PAliqEfet: Double;
+begin
+  Result := fpPAliqEfet;
+end;
+
+function TROC_ReducaoAliq.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('pRedAliq', JFloat(fpPRedAliq));
+  Result.Add('pAliqEfet', JFloat(fpPAliqEfet));
+end;
+
+class function TROC_CredPres.FromJSON(AObj: TJSONObject): IROCCreditoPresumido;
 var
-  LObj: TJSONObject;
+  L: TROC_CredPres;
 begin
-  Result := TGrupoIBSCBS.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpVBC := JSONGetFloat(AObj, 'vBC');
-
-  LObj := SafeGetObj(AObj, 'gIBSUF');
-  if LObj <> nil then
-    Result.fpgIBSUF := TIBSUF.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gIBSMun');
-  if LObj <> nil then
-    Result.fpgIBSMun := TIBSMun.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gCBS');
-  if LObj <> nil then
-    Result.fpgCBS := TCBS.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gIBSCredPres');
-  if LObj <> nil then
-    Result.fpgIBSCredPres := TCreditoPresumido.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gCBSCredPres');
-  if LObj <> nil then
-    Result.fpgCBSCredPres := TCreditoPresumido.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gTribCompraGov');
-  if LObj <> nil then
-    Result.fpgTribCompraGov := TTributacaoCompraGovernamental.FromJSON(LObj);
+  L := TROC_CredPres.Create;
+  if AObj <> nil then
+  begin
+    L.fpCCredPres := JSONGetInt(AObj, 'cCredPres');
+    L.fpPCredPres := JSONGetFloat(AObj, 'pCredPres');
+    L.fpVCredPres := JSONGetFloat(AObj, 'vCredPres');
+    L.fpVCredPresCondSus := JSONGetFloat(AObj, 'vCredPresCondSus');
+  end;
+  Result := L;
 end;
 
-{ TMonofasia }
-
-class function TMonofasia.FromJSON(AObj: TJSONObject): TMonofasia;
+function TROC_CredPres.CCredPres: Integer;
 begin
-  Result := TMonofasia.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpQBCMono := JSONGetFloat(AObj, 'qBCMono');
-  Result.fpAdRemIBS := JSONGetFloat(AObj, 'adRemIBS');
-  Result.fpAdRemCBS := JSONGetFloat(AObj, 'adRemCBS');
-  Result.fpVIBSMono := JSONGetFloat(AObj, 'vIBSMono');
-  Result.fpVCBSMono := JSONGetFloat(AObj, 'vCBSMono');
-  Result.fpVIBSMonoDif := JSONGetFloat(AObj, 'vIBSMonoDif');
-  Result.fpVCBSMonoDif := JSONGetFloat(AObj, 'vCBSMonoDif');
-  Result.fpVTotIBSMonoItem := JSONGetFloat(AObj, 'vTotIBSMonoItem');
-  Result.fpVTotCBSMonoItem := JSONGetFloat(AObj, 'vTotCBSMonoItem');
+  Result := fpCCredPres;
 end;
 
-{ TIBSCBS }
-
-destructor TIBSCBS.Destroy;
+function TROC_CredPres.PCredPres: Double;
 begin
-  FreeAndNil(fpgIBSCBS);
-  FreeAndNil(fpgIBSCBSMono);
-  FreeAndNil(fpgTransfCred);
-  FreeAndNil(fpgCredPresIBSZFM);
-  inherited Destroy;
+  Result := fpPCredPres;
 end;
 
-class function TIBSCBS.FromJSON(AObj: TJSONObject): TIBSCBS;
+function TROC_CredPres.VCredPres: Double;
+begin
+  Result := fpVCredPres;
+end;
+
+function TROC_CredPres.VCredPresCondSus: Double;
+begin
+  Result := fpVCredPresCondSus;
+end;
+
+function TROC_CredPres.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('cCredPres', fpCCredPres);
+  Result.Add('pCredPres', JFloat(fpPCredPres));
+  Result.Add('vCredPres', JFloat(fpVCredPres));
+  Result.Add('vCredPresCondSus', JFloat(fpVCredPresCondSus));
+end;
+
+class function TROC_CredPresIBSZFM.FromJSON(AObj: TJSONObject): IROCCreditoPresumidoIBSZFM;
 var
-  LObj: TJSONObject;
+  L: TROC_CredPresIBSZFM;
 begin
-  Result := TIBSCBS.Create;
-  if AObj = nil then
-    Exit;
-
-  // A API pode retornar "CST": "000" (string). Usar JSONGetInt para fallback.
-  Result.fpCST := JSONGetInt(AObj, 'CST');
-  Result.fpcClassTrib := AObj.Get('cClassTrib', '');
-
-  LObj := SafeGetObj(AObj, 'gIBSCBS');
-  if LObj <> nil then
-    Result.fpgIBSCBS := TGrupoIBSCBS.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gIBSCBSMono');
-  if LObj <> nil then
-    Result.fpgIBSCBSMono := TMonofasia.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gTransfCred');
-  if LObj <> nil then
-    Result.fpgTransfCred := TTransferenciaCredito.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gCredPresIBSZFM');
-  if LObj <> nil then
-    Result.fpgCredPresIBSZFM := TCreditoPresumidoIBSZFM.FromJSON(LObj);
+  L := TROC_CredPresIBSZFM.Create;
+  if AObj <> nil then
+  begin
+    L.fpTpCredPresIBSZFM := JSONGetInt(AObj, 'tpCredPresIBSZFM');
+    L.fpVCredPresIBSZFM  := JSONGetFloat(AObj, 'vCredPresIBSZFM');
+  end;
+  Result := L;
 end;
 
-{ TIBSUFTotal }
+function TROC_CredPresIBSZFM.TpCredPresIBSZFM: Integer; begin Result := fpTpCredPresIBSZFM; end;
+function TROC_CredPresIBSZFM.VCredPresIBSZFM: Double;   begin Result := fpVCredPresIBSZFM; end;
 
-class function TIBSUFTotal.FromJSON(AObj: TJSONObject): TIBSUFTotal;
+function TROC_CredPresIBSZFM.ToJSON: TJSONObject;
 begin
-  Result := TIBSUFTotal.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpVDif := JSONGetFloat(AObj, 'vDif');
-  Result.fpVDevTrib := JSONGetFloat(AObj, 'vDevTrib');
-  Result.fpVIBSUF := JSONGetFloat(AObj, 'vIBSUF');
+  Result := TJSONObject.Create;
+  Result.Add('tpCredPresIBSZFM', fpTpCredPresIBSZFM);
+  Result.Add('vCredPresIBSZFM', JFloat(fpVCredPresIBSZFM));
 end;
 
-{ TIBSMunTotal }
-
-class function TIBSMunTotal.FromJSON(AObj: TJSONObject): TIBSMunTotal;
-begin
-  Result := TIBSMunTotal.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpVDif := JSONGetFloat(AObj, 'vDif');
-  Result.fpVDevTrib := JSONGetFloat(AObj, 'vDevTrib');
-  Result.fpVIBSMun := JSONGetFloat(AObj, 'vIBSMun');
-end;
-
-{ TIBSTotal }
-
-destructor TIBSTotal.Destroy;
-begin
-  FreeAndNil(fpgIBSUF);
-  FreeAndNil(fpgIBSMun);
-  inherited Destroy;
-end;
-
-class function TIBSTotal.FromJSON(AObj: TJSONObject): TIBSTotal;
+class function TROC_TransfCred.FromJSON(AObj: TJSONObject): IROCTransferenciaCredito;
 var
-  LObj: TJSONObject;
+  L: TROC_TransfCred;
 begin
-  Result := TIBSTotal.Create;
-  if AObj = nil then
-    Exit;
-
-  LObj := SafeGetObj(AObj, 'gIBSUF');
-  if LObj <> nil then
-    Result.fpgIBSUF := TIBSUFTotal.FromJSON(LObj);
-
-  LObj := SafeGetObj(AObj, 'gIBSMun');
-  if LObj <> nil then
-    Result.fpgIBSMun := TIBSMunTotal.FromJSON(LObj);
-
-  Result.fpVIBS := JSONGetFloat(AObj, 'vIBS');
-  Result.fpVCredPres := JSONGetFloat(AObj, 'vCredPres');
-  Result.fpVCredPresCondSus := JSONGetFloat(AObj, 'vCredPresCondSus');
+  L := TROC_TransfCred.Create;
+  if AObj <> nil then
+  begin
+    L.fpVIBS := JSONGetFloat(AObj, 'vIBS');
+    L.fpVCBS := JSONGetFloat(AObj, 'vCBS');
+  end;
+  Result := L;
 end;
 
-{ TCBSTotal }
-
-class function TCBSTotal.FromJSON(AObj: TJSONObject): TCBSTotal;
+function TROC_TransfCred.VIBS: Double;
 begin
-  Result := TCBSTotal.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpVDif := JSONGetFloat(AObj, 'vDif');
-  Result.fpVDevTrib := JSONGetFloat(AObj, 'vDevTrib');
-  Result.fpVCBS := JSONGetFloat(AObj, 'vCBS');
-  Result.fpVCredPres := JSONGetFloat(AObj, 'vCredPres');
-  Result.fpVCredPresCondSus := JSONGetFloat(AObj, 'vCredPresCondSus');
+  Result := fpVIBS;
 end;
 
-{ TIBSCBSTotal }
-
-destructor TIBSCBSTotal.Destroy;
+function TROC_TransfCred.VCBS: Double;
 begin
-  FreeAndNil(fpgIBS);
-  FreeAndNil(fpgCBS);
-  inherited Destroy;
+  Result := fpVCBS;
 end;
 
-class function TIBSCBSTotal.FromJSON(AObj: TJSONObject): TIBSCBSTotal;
+function TROC_TransfCred.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('vIBS', JFloat(fpVIBS));
+  Result.Add('vCBS', JFloat(fpVCBS));
+end;
+
+class function TROC_TribCompraGov.FromJSON(AObj: TJSONObject): IROCTributacaoCompraGovernamental;
 var
-  LObj: TJSONObject;
+  L: TROC_TribCompraGov;
 begin
-  Result := TIBSCBSTotal.Create;
-  if AObj = nil then
-    Exit;
+  L := TROC_TribCompraGov.Create;
+  if AObj <> nil then
+  begin
+    L.fpPAliqIBSUF := JSONGetFloat(AObj, 'pAliqIBSUF');
+    L.fpVTribIBSUF := JSONGetFloat(AObj, 'vTribIBSUF');
+    L.fpPAliqIBSMun := JSONGetFloat(AObj, 'pAliqIBSMun');
+    L.fpVTribIBSMun := JSONGetFloat(AObj, 'vTribIBSMun');
+    L.fpPAliqCBS := JSONGetFloat(AObj, 'pAliqCBS');
+    L.fpVTribCBS := JSONGetFloat(AObj, 'vTribCBS');
+  end;
+  Result := L;
+end;
 
-  Result.fpVBCIBSCBS := JSONGetFloat(AObj, 'vBCIBSCBS');
+function TROC_TribCompraGov.PAliqIBSUF: Double;
+begin
+  Result := fpPAliqIBSUF;
+end;
 
-  LObj := SafeGetObj(AObj, 'gIBS');
-  if LObj <> nil then
-    Result.fpgIBS := TIBSTotal.FromJSON(LObj);
+function TROC_TribCompraGov.VTribIBSUF: Double;
+begin
+  Result := fpVTribIBSUF;
+end;
 
-  LObj := SafeGetObj(AObj, 'gCBS');
-  if LObj <> nil then
-    Result.fpgCBS := TCBSTotal.FromJSON(LObj);
+function TROC_TribCompraGov.PAliqIBSMun: Double;
+begin
+  Result := fpPAliqIBSMun;
+end;
+
+function TROC_TribCompraGov.VTribIBSMun: Double;
+begin
+  Result := fpVTribIBSMun;
+end;
+
+function TROC_TribCompraGov.PAliqCBS: Double;
+begin
+  Result := fpPAliqCBS;
+end;
+
+function TROC_TribCompraGov.VTribCBS: Double;
+begin
+  Result := fpVTribCBS;
+end;
+
+function TROC_TribCompraGov.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('pAliqIBSUF', JFloat(fpPAliqIBSUF));
+  Result.Add('vTribIBSUF', JFloat(fpVTribIBSUF));
+  Result.Add('pAliqIBSMun', JFloat(fpPAliqIBSMun));
+  Result.Add('vTribIBSMun', JFloat(fpVTribIBSMun));
+  Result.Add('pAliqCBS', JFloat(fpPAliqCBS));
+  Result.Add('vTribCBS', JFloat(fpVTribCBS));
+end;
+
+class function TROC_IBSUF.FromJSON(AObj: TJSONObject): IROCIBSUF;
+var
+  L: TROC_IBSUF;
+  S: TJSONObject;
+begin
+  L := TROC_IBSUF.Create;
+  if AObj <> nil then
+  begin
+    L.fpPIBSUF := JSONGetFloat(AObj, 'pIBSUF');
+    S := SafeGetObj(AObj, 'gDif');
+    if S <> nil then
+      L.fpGDif := TROC_Diferimento.FromJSON(S);
+    S := SafeGetObj(AObj, 'gDevTrib');
+    if S <> nil then
+      L.fpGDevTrib := TROC_DevTrib.FromJSON(S);
+    S := SafeGetObj(AObj, 'gRed');
+    if S <> nil then
+      L.fpGRed := TROC_ReducaoAliq.FromJSON(S);
+    L.fpVIBSUF := JSONGetFloat(AObj, 'vIBSUF');
+    L.fpMemoriaCalculo := JSONGetString(AObj, 'memoriaCalculo', '');
+  end;
+  Result := L;
+end;
+
+function TROC_IBSUF.PIBSUF: Double;
+begin
+  Result := fpPIBSUF;
+end;
+
+function TROC_IBSUF.GDif: IROCDiferimento;
+begin
+  Result := fpGDif;
+end;
+
+function TROC_IBSUF.GDevTrib: IROCDevolucaoTributos;
+begin
+  Result := fpGDevTrib;
+end;
+
+function TROC_IBSUF.GRed: IROCReducaoAliquota;
+begin
+  Result := fpGRed;
+end;
+
+function TROC_IBSUF.VIBSUF: Double;
+begin
+  Result := fpVIBSUF;
+end;
+
+function TROC_IBSUF.MemoriaCalculo: string;
+begin
+  Result := fpMemoriaCalculo;
+end;
+
+function TROC_IBSUF.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('pIBSUF', JFloat(fpPIBSUF));
+  if fpGDif <> nil then
+    Result.Add('gDif', fpGDif.ToJSON);
+  if fpGDevTrib <> nil then
+    Result.Add('gDevTrib', fpGDevTrib.ToJSON);
+  if fpGRed <> nil then
+    Result.Add('gRed', fpGRed.ToJSON);
+  Result.Add('vIBSUF', JFloat(fpVIBSUF));
+  Result.Add('memoriaCalculo', fpMemoriaCalculo);
+end;
+
+class function TROC_IBSMun.FromJSON(AObj: TJSONObject): IROCIBSMun;
+var
+  L: TROC_IBSMun;
+  S: TJSONObject;
+begin
+  L := TROC_IBSMun.Create;
+  if AObj <> nil then
+  begin
+    L.fpPIBSMun := JSONGetFloat(AObj, 'pIBSMun');
+    S := SafeGetObj(AObj, 'gDif');
+    if S <> nil then
+    L.fpGDif := TROC_Diferimento.FromJSON(S);
+      S := SafeGetObj(AObj, 'gDevTrib');
+    if S <> nil then
+    L.fpGDevTrib := TROC_DevTrib.FromJSON(S);
+      S := SafeGetObj(AObj, 'gRed');
+    if S <> nil then
+      L.fpGRed := TROC_ReducaoAliq.FromJSON(S);
+    L.fpVIBSMun := JSONGetFloat(AObj, 'vIBSMun');
+    L.fpMemoriaCalculo := JSONGetString(AObj, 'memoriaCalculo', '');
+  end;
+  Result := L;
+end;
+
+function TROC_IBSMun.PIBSMun: Double;
+begin
+  Result := fpPIBSMun;
+end;
+
+function TROC_IBSMun.GDif: IROCDiferimento;
+begin
+  Result := fpGDif;
+end;
+
+function TROC_IBSMun.GDevTrib: IROCDevolucaoTributos;
+begin
+  Result := fpGDevTrib;
+end;
+
+function TROC_IBSMun.GRed: IROCReducaoAliquota;
+begin
+  Result := fpGRed;
+end;
+
+function TROC_IBSMun.VIBSMun: Double;
+begin
+  Result := fpVIBSMun;
+end;
+
+function TROC_IBSMun.MemoriaCalculo: string;
+begin
+  Result := fpMemoriaCalculo;
+end;
+
+function TROC_IBSMun.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('pIBSMun', JFloat(fpPIBSMun));
+  if fpGDif <> nil then
+    Result.Add('gDif', fpGDif.ToJSON);
+  if fpGDevTrib <> nil then
+    Result.Add('gDevTrib', fpGDevTrib.ToJSON);
+  if fpGRed <> nil then
+    Result.Add('gRed', fpGRed.ToJSON);
+  Result.Add('vIBSMun', JFloat(fpVIBSMun));
+  Result.Add('memoriaCalculo', fpMemoriaCalculo);
+end;
+
+class function TROC_CBS.FromJSON(AObj: TJSONObject): IROCCBS;
+var
+  L: TROC_CBS;
+  S: TJSONObject;
+begin
+  L := TROC_CBS.Create;
+  if AObj <> nil then
+  begin
+    L.fpPCBS := JSONGetFloat(AObj, 'pCBS');
+    S := SafeGetObj(AObj, 'gDif');
+    if S <> nil then
+      L.fpGDif := TROC_Diferimento.FromJSON(S);
+    S := SafeGetObj(AObj, 'gDevTrib');
+    if S <> nil then
+      L.fpGDevTrib := TROC_DevTrib.FromJSON(S);
+    S := SafeGetObj(AObj, 'gRed');
+    if S <> nil then
+      L.fpGRed := TROC_ReducaoAliq.FromJSON(S);
+    L.fpVCBS := JSONGetFloat(AObj, 'vCBS');
+    L.fpMemoriaCalculo := JSONGetString(AObj, 'memoriaCalculo', '');
+  end;
+  Result := L;
+end;
+
+function TROC_CBS.PCBS: Double;
+begin
+  Result := fpPCBS;
+end;
+
+function TROC_CBS.GDif: IROCDiferimento;
+begin
+  Result := fpGDif;
+end;
+
+function TROC_CBS.GDevTrib: IROCDevolucaoTributos;
+begin
+  Result := fpGDevTrib;
+end;
+
+function TROC_CBS.GRed: IROCReducaoAliquota;
+begin
+  Result := fpGRed;
+end;
+
+function TROC_CBS.VCBS: Double;
+begin
+  Result := fpVCBS;
+end;
+
+function TROC_CBS.MemoriaCalculo: string;
+begin
+  Result := fpMemoriaCalculo;
+end;
+
+function TROC_CBS.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('pCBS', JFloat(fpPCBS));
+  if fpGDif <> nil then
+    Result.Add('gDif', fpGDif.ToJSON);
+  if fpGDevTrib <> nil then
+    Result.Add('gDevTrib', fpGDevTrib.ToJSON);
+  if fpGRed <> nil then
+    Result.Add('gRed', fpGRed.ToJSON);
+  Result.Add('vCBS', JFloat(fpVCBS));
+  Result.Add('memoriaCalculo', fpMemoriaCalculo);
+end;
+
+class function TROC_GrupoIBSCBS.FromJSON(AObj: TJSONObject): IROCGrupoIBSCBS;
+var
+  L: TROC_GrupoIBSCBS;
+  S: TJSONObject;
+begin
+  L := TROC_GrupoIBSCBS.Create;
+  if AObj <> nil then
+  begin
+    L.fpVBC := JSONGetFloat(AObj, 'vBC');
+
+    S := SafeGetObj(AObj, 'gIBSUF');
+    if S <> nil then
+      L.fpGIBSUF := TROC_IBSUF.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gIBSMun');
+    if S <> nil then
+      L.fpGIBSMun := TROC_IBSMun.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gCBS');
+    if S <> nil then
+      L.fpGCBS := TROC_CBS.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gIBSCredPres');
+    if S <> nil then
+      L.fpGIBSCredPres := TROC_CredPres.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gCBSCredPres');
+    if S <> nil then
+      L.fpGCBSCredPres := TROC_CredPres.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gTribCompraGov');
+    if S <> nil then
+      L.fpGTribCompraGov := TROC_TribCompraGov.FromJSON(S);
+  end;
+  Result := L;
+end;
+
+function TROC_GrupoIBSCBS.VBC: Double;
+begin
+  Result := fpVBC;
+end;
+
+function TROC_GrupoIBSCBS.GIBSUF: IROCIBSUF;
+begin
+  Result := fpGIBSUF;
+end;
+
+function TROC_GrupoIBSCBS.GIBSMun: IROCIBSMun;
+begin
+  Result := fpGIBSMun;
+end;
+
+function TROC_GrupoIBSCBS.GCBS: IROCCBS;
+begin
+  Result := fpGCBS;
+end;
+
+function TROC_GrupoIBSCBS.GIBSCredPres: IROCCreditoPresumido;
+begin
+  Result := fpGIBSCredPres;
+end;
+
+function TROC_GrupoIBSCBS.GCBSCredPres: IROCCreditoPresumido;
+begin
+  Result := fpGCBSCredPres;
+end;
+
+function TROC_GrupoIBSCBS.GTribCompraGov: IROCTributacaoCompraGovernamental;
+begin
+  Result := fpGTribCompraGov;
+end;
+
+function TROC_GrupoIBSCBS.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('vBC', JFloat(fpVBC));
+  if fpGIBSUF <> nil then
+    Result.Add('gIBSUF', fpGIBSUF.ToJSON);
+  if fpGIBSMun <> nil then
+    Result.Add('gIBSMun', fpGIBSMun.ToJSON);
+  if fpGCBS <> nil then
+    Result.Add('gCBS', fpGCBS.ToJSON);
+  if fpGIBSCredPres <> nil then
+    Result.Add('gIBSCredPres', fpGIBSCredPres.ToJSON);
+  if fpGCBSCredPres <> nil then
+    Result.Add('gCBSCredPres', fpGCBSCredPres.ToJSON);
+  if fpGTribCompraGov <> nil then
+    Result.Add('gTribCompraGov', fpGTribCompraGov.ToJSON);
+end;
+
+class function TROC_Monofasia.FromJSON(AObj: TJSONObject): IROCMonofasia;
+var
+  L: TROC_Monofasia;
+begin
+  L := TROC_Monofasia.Create;
+  if AObj <> nil then
+  begin
+    L.fpQBCMono := JSONGetFloat(AObj, 'qBCMono');
+    L.fpAdRemIBS := JSONGetFloat(AObj, 'adRemIBS');
+    L.fpAdRemCBS := JSONGetFloat(AObj, 'adRemCBS');
+    L.fpVIBSMono := JSONGetFloat(AObj, 'vIBSMono');
+    L.fpVCBSMono := JSONGetFloat(AObj, 'vCBSMono');
+    L.fpVIBSMonoDif := JSONGetFloat(AObj, 'vIBSMonoDif');
+    L.fpVCBSMonoDif := JSONGetFloat(AObj, 'vCBSMonoDif');
+    L.fpVTotIBSMonoItem := JSONGetFloat(AObj, 'vTotIBSMonoItem');
+    L.fpVTotCBSMonoItem := JSONGetFloat(AObj, 'vTotCBSMonoItem');
+  end;
+  Result := L;
+end;
+
+function TROC_Monofasia.QBCMono: Double;
+begin
+  Result := fpQBCMono;
+end;
+
+function TROC_Monofasia.AdRemIBS: Double;
+begin
+  Result := fpAdRemIBS;
+end;
+
+function TROC_Monofasia.AdRemCBS: Double;
+begin
+  Result := fpAdRemCBS;
+end;
+
+function TROC_Monofasia.VIBSMono: Double;
+begin
+  Result := fpVIBSMono;
+end;
+
+function TROC_Monofasia.VCBSMono: Double;
+begin
+  Result := fpVCBSMono;
+end;
+
+function TROC_Monofasia.VIBSMonoDif: Double;
+begin
+  Result := fpVIBSMonoDif;
+end;
+
+function TROC_Monofasia.VCBSMonoDif: Double;
+begin
+  Result := fpVCBSMonoDif;
+end;
+
+function TROC_Monofasia.VTotIBSMonoItem: Double;
+begin
+  Result := fpVTotIBSMonoItem;
+end;
+
+function TROC_Monofasia.VTotCBSMonoItem: Double;
+begin
+  Result := fpVTotCBSMonoItem;
+end;
+
+function TROC_Monofasia.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('qBCMono', JFloat(fpQBCMono));
+  Result.Add('adRemIBS', JFloat(fpAdRemIBS));
+  Result.Add('adRemCBS', JFloat(fpAdRemCBS));
+  Result.Add('vIBSMono', JFloat(fpVIBSMono));
+  Result.Add('vCBSMono', JFloat(fpVCBSMono));
+  Result.Add('vIBSMonoDif', JFloat(fpVIBSMonoDif));
+  Result.Add('vCBSMonoDif', JFloat(fpVCBSMonoDif));
+  Result.Add('vTotIBSMonoItem', JFloat(fpVTotIBSMonoItem));
+  Result.Add('vTotCBSMonoItem', JFloat(fpVTotCBSMonoItem));
+end;
+
+class function TROCIBSCBSGroup.FromJSON(AObj: TJSONObject): IROCIBSCBS;
+var
+  L: TROCIBSCBSGroup;
+  S: TJSONObject;
+begin
+  L := TROCIBSCBSGroup.Create;
+  if AObj <> nil then
+  begin
+    // CST pode vir "000" -> convertemos com JSONGetInt (já lida com string/número)
+    L.fpCST := JSONGetInt(AObj, 'CST');
+    L.fpCClassTrib := JSONGetString(AObj, 'cClassTrib', '');
+
+    S := SafeGetObj(AObj, 'gIBSCBS');
+    if S <> nil then
+      L.fpGIBSCBS := TROC_GrupoIBSCBS.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gIBSCBSMono');
+    if S <> nil then
+      L.fpGIBSCBSMono := TROC_Monofasia.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gTransfCred');
+    if S <> nil then
+      L.fpGTransfCred := TROC_TransfCred.FromJSON(S);
+
+    S := SafeGetObj(AObj, 'gCredPresIBSZFM');
+    if S <> nil then
+      L.fpGCredPresIBSZFM := TROC_CredPresIBSZFM.FromJSON(S);
+  end;
+  Result := L;
+end;
+
+function TROCIBSCBSGroup.CST: Integer;
+begin
+  Result := fpCST;
+end;
+
+function TROCIBSCBSGroup.CClassTrib: string;
+begin
+  Result := fpCClassTrib;
+end;
+
+function TROCIBSCBSGroup.GIBSCBS: IROCGrupoIBSCBS;
+begin
+  Result := fpGIBSCBS;
+end;
+
+function TROCIBSCBSGroup.GIBSCBSMono: IROCMonofasia;
+begin
+  Result := fpGIBSCBSMono;
+end;
+
+function TROCIBSCBSGroup.GTransfCred: IROCTransferenciaCredito;
+begin
+  Result := fpGTransfCred;
+end;
+
+function TROCIBSCBSGroup.GCredPresIBSZFM: IROCCreditoPresumidoIBSZFM;
+begin
+  Result := fpGCredPresIBSZFM;
+end;
+
+function TROCIBSCBSGroup.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('CST', fpCST);
+  Result.Add('cClassTrib', fpCClassTrib);
+  if fpGIBSCBS <> nil then
+    Result.Add('gIBSCBS', fpGIBSCBS.ToJSON);
+  if fpGIBSCBSMono <> nil then
+    Result.Add('gIBSCBSMono', fpGIBSCBSMono.ToJSON);
+  if fpGTransfCred <> nil then
+    Result.Add('gTransfCred', fpGTransfCred.ToJSON);
+  if fpGCredPresIBSZFM <> nil then
+    Result.Add('gCredPresIBSZFM', fpGCredPresIBSZFM.ToJSON);
 end;
 
 end.
+

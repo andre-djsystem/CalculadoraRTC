@@ -5,12 +5,30 @@ unit CalculadoraRTC.Schemas.ROC.ISel;
 interface
 
 uses
-  Classes, SysUtils,
-  fpjson,
+  Classes, SysUtils, fpjson,
   CalculadoraRTC.Utils.JSON;
 
 type
-  TImpostoSeletivo = class
+  { Saída do grupo "IS" no ROC (Regime Geral) }
+  IROCImpostoSeletivo = interface
+    ['{E1A2B3C4-D5E6-47F8-9A0B-1C2D3E4F5A6B}']
+    // getters (nomes fiéis ao Swagger)
+    function CSTIS: Integer;
+    function CClassTribIS: string;
+    function VBCIS: Double;
+    function PIS: Double;
+    function PISEspec: Double;
+    function UTrib: string;
+    function QTrib: Double;
+    function VIS: Double;
+    function MemoriaCalculo: string;
+
+    // utilitário
+    function ToJSON: TJSONObject;
+  end;
+
+  { Implementação }
+  TROCImpostoSeletivo = class(TInterfacedObject, IROCImpostoSeletivo)
   private
     fpCSTIS: Integer;
     fpCClassTribIS: string;
@@ -22,62 +40,108 @@ type
     fpVIS: Double;
     fpMemoriaCalculo: string;
   public
-    class function FromJSON(AObj: TJSONObject): TImpostoSeletivo; static;
+    // Fábrica a partir do JSON da API
+    class function FromJSON(AObj: TJSONObject): IROCImpostoSeletivo; static;
 
-    property CSTIS: Integer read fpCSTIS write fpCSTIS;
-    property cClassTribIS: string read fpCClassTribIS write fpCClassTribIS;
-    property vBCIS: Double read fpVBCIS write fpVBCIS;
-    property pIS: Double read fpPIS write fpPIS;
-    property pISEspec: Double read fpPISEspec write fpPISEspec;
-    property uTrib: string read fpUTrib write fpUTrib;
-    property qTrib: Double read fpQTrib write fpQTrib;
-    property vIS: Double read fpVIS write fpVIS;
-    property memoriaCalculo: string read fpMemoriaCalculo write fpMemoriaCalculo;
-  end;
+    // IROCImpostoSeletivo
+    function CSTIS: Integer;
+    function CClassTribIS: string;
+    function VBCIS: Double;
+    function PIS: Double;
+    function PISEspec: Double;
+    function UTrib: string;
+    function QTrib: Double;
+    function VIS: Double;
+    function MemoriaCalculo: string;
 
-  TImpostoSeletivoTotal = class
-  private
-    fpVIS: Double;
-  public
-    class function FromJSON(AObj: TJSONObject): TImpostoSeletivoTotal; static;
-
-    property vIS: Double read fpVIS write fpVIS;
+    function ToJSON: TJSONObject;
   end;
 
 implementation
 
-{ TImpostoSeletivo }
+{ TROCImpostoSeletivo }
 
-class function TImpostoSeletivo.FromJSON(AObj: TJSONObject): TImpostoSeletivo;
+class function TROCImpostoSeletivo.FromJSON(AObj: TJSONObject): IROCImpostoSeletivo;
+var
+  LInst: TROCImpostoSeletivo;
 begin
-  Result := TImpostoSeletivo.Create;
-  if AObj = nil then
-    Exit;
+  LInst := TROCImpostoSeletivo.Create;
 
-  // Alguns backends retornam inteiros como string (ex.: "000") — usar helper robusto
-  Result.fpCSTIS := JSONGetInt(AObj, 'CSTIS');
-  Result.fpCClassTribIS := AObj.Get('cClassTribIS', '');
+  if AObj <> nil then
+  begin
+    // Campos podem vir como número ou string — usamos helpers robustos
+    LInst.fpCSTIS         := JSONGetInt(AObj, 'CSTIS');
+    LInst.fpCClassTribIS  := JSONGetString(AObj, 'cClassTribIS', '');
+    LInst.fpVBCIS         := JSONGetFloat(AObj, 'vBCIS');
+    LInst.fpPIS           := JSONGetFloat(AObj, 'pIS');
+    LInst.fpPISEspec      := JSONGetFloat(AObj, 'pISEspec');
+    LInst.fpUTrib         := JSONGetString(AObj, 'uTrib', '');
+    LInst.fpQTrib         := JSONGetFloat(AObj, 'qTrib');
+    LInst.fpVIS           := JSONGetFloat(AObj, 'vIS');
+    LInst.fpMemoriaCalculo:= JSONGetString(AObj, 'memoriaCalculo', '');
+  end;
 
-  Result.fpVBCIS := JSONGetFloat(AObj, 'vBCIS');
-  Result.fpPIS := JSONGetFloat(AObj, 'pIS');
-  Result.fpPISEspec := JSONGetFloat(AObj, 'pISEspec');
-
-  Result.fpUTrib := AObj.Get('uTrib', '');
-  Result.fpQTrib := JSONGetFloat(AObj, 'qTrib');
-  Result.fpVIS := JSONGetFloat(AObj, 'vIS');
-
-  Result.fpMemoriaCalculo := AObj.Get('memoriaCalculo', '');
+  Result := LInst;
 end;
 
-{ TImpostoSeletivoTotal }
-
-class function TImpostoSeletivoTotal.FromJSON(AObj: TJSONObject): TImpostoSeletivoTotal;
+function TROCImpostoSeletivo.CSTIS: Integer;
 begin
-  Result := TImpostoSeletivoTotal.Create;
-  if AObj = nil then
-    Exit;
+  Result := fpCSTIS;
+end;
 
-  Result.fpVIS := JSONGetFloat(AObj, 'vIS');
+function TROCImpostoSeletivo.CClassTribIS: string;
+begin
+  Result := fpCClassTribIS;
+end;
+
+function TROCImpostoSeletivo.VBCIS: Double;
+begin
+  Result := fpVBCIS;
+end;
+
+function TROCImpostoSeletivo.PIS: Double;
+begin
+  Result := fpPIS;
+end;
+
+function TROCImpostoSeletivo.PISEspec: Double;
+begin
+  Result := fpPISEspec;
+end;
+
+function TROCImpostoSeletivo.UTrib: string;
+begin
+  Result := fpUTrib;
+end;
+
+function TROCImpostoSeletivo.QTrib: Double;
+begin
+  Result := fpQTrib;
+end;
+
+function TROCImpostoSeletivo.VIS: Double;
+begin
+  Result := fpVIS;
+end;
+
+function TROCImpostoSeletivo.MemoriaCalculo: string;
+begin
+  Result := fpMemoriaCalculo;
+end;
+
+function TROCImpostoSeletivo.ToJSON: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.Add('CSTIS', fpCSTIS);
+  Result.Add('cClassTribIS', fpCClassTribIS);
+  Result.Add('vBCIS', JFloat(fpVBCIS));
+  Result.Add('pIS', JFloat(fpPIS));
+  Result.Add('pISEspec', JFloat(fpPISEspec));
+  Result.Add('uTrib', fpUTrib);
+  Result.Add('qTrib', JFloat(fpQTrib));
+  Result.Add('vIS', JFloat(fpVIS));
+  Result.Add('memoriaCalculo', fpMemoriaCalculo);
 end;
 
 end.
+

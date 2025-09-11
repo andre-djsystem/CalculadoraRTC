@@ -1,16 +1,59 @@
 unit CalculadoraRTC.Schemas.BaseCalculo;
 
 {$mode objfpc}{$H+}
+{$modeswitch advancedrecords}
 
 interface
 
 uses
-  Classes, SysUtils,
-  fpjson, jsonparser,
+  Classes, SysUtils, fpjson, jsonparser,
   CalculadoraRTC.Utils.JSON;
 
 type
-  TBaseCalculoISMercadoriasInput = class
+  ICalcISBaseInput = interface
+    ['{7F9B5F7D-22B2-4C4B-9C7C-9C8F2F6E9C25}']
+    function ValorIntegralCobrado(const AValue: Double): ICalcISBaseInput;
+    function AjusteValorOperacao(const AValue: Double): ICalcISBaseInput;
+    function Juros(const AValue: Double): ICalcISBaseInput;
+    function Multas(const AValue: Double): ICalcISBaseInput;
+    function Acrescimos(const AValue: Double): ICalcISBaseInput;
+    function Encargos(const AValue: Double): ICalcISBaseInput;
+    function DescontosCondicionais(const AValue: Double): ICalcISBaseInput;
+    function FretePorDentro(const AValue: Double): ICalcISBaseInput;
+    function OutrosTributos(const AValue: Double): ICalcISBaseInput;
+    function DemaisImportancias(const AValue: Double): ICalcISBaseInput;
+    function ICMS(const AValue: Double): ICalcISBaseInput;
+    function ISS(const AValue: Double): ICalcISBaseInput;
+    function PIS(const AValue: Double): ICalcISBaseInput;
+    function COFINS(const AValue: Double): ICalcISBaseInput;
+    function Bonificacao(const AValue: Double): ICalcISBaseInput;
+    function DevolucaoVendas(const AValue: Double): ICalcISBaseInput;
+
+    function ToJSON: TJSONObject;
+  end;
+
+  ICalcCibsBaseInput = interface
+    ['{1C21F0E2-73C7-4C35-A89D-1ABF7E6F0B56}']
+    function ValorFornecimento(const AValue: Double): ICalcCibsBaseInput;
+    function AjusteValorOperacao(const AValue: Double): ICalcCibsBaseInput;
+    function Juros(const AValue: Double): ICalcCibsBaseInput;
+    function Multas(const AValue: Double): ICalcCibsBaseInput;
+    function Acrescimos(const AValue: Double): ICalcCibsBaseInput;
+    function Encargos(const AValue: Double): ICalcCibsBaseInput;
+    function DescontosCondicionais(const AValue: Double): ICalcCibsBaseInput;
+    function FretePorDentro(const AValue: Double): ICalcCibsBaseInput;
+    function OutrosTributos(const AValue: Double): ICalcCibsBaseInput;
+    function ImpostoSeletivo(const AValue: Double): ICalcCibsBaseInput;
+    function DemaisImportancias(const AValue: Double): ICalcCibsBaseInput;
+    function ICMS(const AValue: Double): ICalcCibsBaseInput;
+    function ISS(const AValue: Double): ICalcCibsBaseInput;
+    function PIS(const AValue: Double): ICalcCibsBaseInput;
+    function COFINS(const AValue: Double): ICalcCibsBaseInput;
+
+    function ToJSON: TJSONObject;
+  end;
+
+  TBaseCalculoISMercadoriasInput = class(TInterfacedObject, ICalcISBaseInput)
   private
     fpValorIntegralCobrado: Double;
     fpAjusteValorOperacao: Double;
@@ -29,27 +72,29 @@ type
     fpBonificacao: Double;
     fpDevolucaoVendas: Double;
   public
-    function ValorIntegralCobrado(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function AjusteValorOperacao(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function Juros(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function Multas(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function Acrescimos(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function Encargos(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function DescontosCondicionais(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function FretePorDentro(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function OutrosTributos(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function DemaisImportancias(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function ICMS(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function ISS(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function PIS(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function COFINS(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function Bonificacao(const AValue: Double): TBaseCalculoISMercadoriasInput;
-    function DevolucaoVendas(const AValue: Double): TBaseCalculoISMercadoriasInput;
+    class function New: ICalcISBaseInput;
+
+    function ValorIntegralCobrado(const AValue: Double): ICalcISBaseInput;
+    function AjusteValorOperacao(const AValue: Double): ICalcISBaseInput;
+    function Juros(const AValue: Double): ICalcISBaseInput;
+    function Multas(const AValue: Double): ICalcISBaseInput;
+    function Acrescimos(const AValue: Double): ICalcISBaseInput;
+    function Encargos(const AValue: Double): ICalcISBaseInput;
+    function DescontosCondicionais(const AValue: Double): ICalcISBaseInput;
+    function FretePorDentro(const AValue: Double): ICalcISBaseInput;
+    function OutrosTributos(const AValue: Double): ICalcISBaseInput;
+    function DemaisImportancias(const AValue: Double): ICalcISBaseInput;
+    function ICMS(const AValue: Double): ICalcISBaseInput;
+    function ISS(const AValue: Double): ICalcISBaseInput;
+    function PIS(const AValue: Double): ICalcISBaseInput;
+    function COFINS(const AValue: Double): ICalcISBaseInput;
+    function Bonificacao(const AValue: Double): ICalcISBaseInput;
+    function DevolucaoVendas(const AValue: Double): ICalcISBaseInput;
 
     function ToJSON: TJSONObject;
   end;
 
-  TBaseCalculoCibsInput = class
+  TBaseCalculoCibsInput = class(TInterfacedObject, ICalcCibsBaseInput)
   private
     fpValorFornecimento: Double;
     fpAjusteValorOperacao: Double;
@@ -67,144 +112,143 @@ type
     fpPIS: Double;
     fpCOFINS: Double;
   public
-    function ValorFornecimento(const AValue: Double): TBaseCalculoCibsInput;
-    function AjusteValorOperacao(const AValue: Double): TBaseCalculoCibsInput;
-    function Juros(const AValue: Double): TBaseCalculoCibsInput;
-    function Multas(const AValue: Double): TBaseCalculoCibsInput;
-    function Acrescimos(const AValue: Double): TBaseCalculoCibsInput;
-    function Encargos(const AValue: Double): TBaseCalculoCibsInput;
-    function DescontosCondicionais(const AValue: Double): TBaseCalculoCibsInput;
-    function FretePorDentro(const AValue: Double): TBaseCalculoCibsInput;
-    function OutrosTributos(const AValue: Double): TBaseCalculoCibsInput;
-    function ImpostoSeletivo(const AValue: Double): TBaseCalculoCibsInput;
-    function DemaisImportancias(const AValue: Double): TBaseCalculoCibsInput;
-    function ICMS(const AValue: Double): TBaseCalculoCibsInput;
-    function ISS(const AValue: Double): TBaseCalculoCibsInput;
-    function PIS(const AValue: Double): TBaseCalculoCibsInput;
-    function COFINS(const AValue: Double): TBaseCalculoCibsInput;
+    class function New: ICalcCibsBaseInput;
+
+    function ValorFornecimento(const AValue: Double): ICalcCibsBaseInput;
+    function AjusteValorOperacao(const AValue: Double): ICalcCibsBaseInput;
+    function Juros(const AValue: Double): ICalcCibsBaseInput;
+    function Multas(const AValue: Double): ICalcCibsBaseInput;
+    function Acrescimos(const AValue: Double): ICalcCibsBaseInput;
+    function Encargos(const AValue: Double): ICalcCibsBaseInput;
+    function DescontosCondicionais(const AValue: Double): ICalcCibsBaseInput;
+    function FretePorDentro(const AValue: Double): ICalcCibsBaseInput;
+    function OutrosTributos(const AValue: Double): ICalcCibsBaseInput;
+    function ImpostoSeletivo(const AValue: Double): ICalcCibsBaseInput;
+    function DemaisImportancias(const AValue: Double): ICalcCibsBaseInput;
+    function ICMS(const AValue: Double): ICalcCibsBaseInput;
+    function ISS(const AValue: Double): ICalcCibsBaseInput;
+    function PIS(const AValue: Double): ICalcCibsBaseInput;
+    function COFINS(const AValue: Double): ICalcCibsBaseInput;
 
     function ToJSON: TJSONObject;
-  end;
-
-  TBaseCalculoISMercadoriasModel = class
-  private
-    fpBaseCalculo: Double;
-  public
-    class function FromJSON(AJson: TJSONData): TBaseCalculoISMercadoriasModel;
-    property BaseCalculo: Double read fpBaseCalculo write fpBaseCalculo;
   end;
 
 implementation
 
 { TBaseCalculoISMercadoriasInput }
 
+class function TBaseCalculoISMercadoriasInput.New: ICalcISBaseInput;
+begin
+  Result := Create;
+end;
+
 function TBaseCalculoISMercadoriasInput.ValorIntegralCobrado(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpValorIntegralCobrado := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.AjusteValorOperacao(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpAjusteValorOperacao := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.Juros(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpJuros := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.Multas(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpMultas := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.Acrescimos(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpAcrescimos := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.Encargos(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpEncargos := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.DescontosCondicionais(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpDescontosCondicionais := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.FretePorDentro(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpFretePorDentro := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.OutrosTributos(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpOutrosTributos := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.DemaisImportancias(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpDemaisImportancias := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.ICMS(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpICMS := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.ISS(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpISS := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.PIS(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpPIS := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.COFINS(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpCOFINS := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.Bonificacao(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpBonificacao := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoISMercadoriasInput.DevolucaoVendas(
-  const AValue: Double): TBaseCalculoISMercadoriasInput;
+  const AValue: Double): ICalcISBaseInput;
 begin
   fpDevolucaoVendas := AValue;
   Result := Self;
@@ -233,106 +277,111 @@ end;
 
 { TBaseCalculoCibsInput }
 
+class function TBaseCalculoCibsInput.New: ICalcCibsBaseInput;
+begin
+  Result := Create;
+end;
+
 function TBaseCalculoCibsInput.ValorFornecimento(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpValorFornecimento := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.AjusteValorOperacao(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpAjusteValorOperacao := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.Juros(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpJuros := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.Multas(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpMultas := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.Acrescimos(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpAcrescimos := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.Encargos(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpEncargos := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.DescontosCondicionais(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpDescontosCondicionais := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.FretePorDentro(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpFretePorDentro := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.OutrosTributos(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpOutrosTributos := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.ImpostoSeletivo(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpImpostoSeletivo := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.DemaisImportancias(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpDemaisImportancias := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.ICMS(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpICMS := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.ISS(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpISS := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.PIS(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpPIS := AValue;
   Result := Self;
 end;
 
 function TBaseCalculoCibsInput.COFINS(
-  const AValue: Double): TBaseCalculoCibsInput;
+  const AValue: Double): ICalcCibsBaseInput;
 begin
   fpCOFINS := AValue;
   Result := Self;
@@ -358,19 +407,5 @@ begin
   Result.Add('cofins', JFloat(fpCOFINS));
 end;
 
-{ TBaseCalculoISMercadoriasModel }
-
-class function TBaseCalculoISMercadoriasModel.FromJSON(
-  AJson: TJSONData): TBaseCalculoISMercadoriasModel;
-var
-  LObj: TJSONObject;
-begin
-  Result := TBaseCalculoISMercadoriasModel.Create;
-  if (AJson = nil) or (AJson.JSONType <> jtObject) then
-    Exit;
-
-  LObj := TJSONObject(AJson);
-  Result.fpBaseCalculo := JSONGetFloat(LObj, 'baseCalculo');
-end;
-
 end.
+

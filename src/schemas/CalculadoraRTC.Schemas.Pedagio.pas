@@ -5,152 +5,258 @@ unit CalculadoraRTC.Schemas.Pedagio;
 interface
 
 uses
-  Classes, SysUtils,
-  fpjson, jsonparser, fgl,
-  CalculadoraRTC.Utils.JSON,
-  CalculadoraRTC.Utils.DateTime;
+  Classes, SysUtils, fgl,
+  fpjson, jsonparser,
+  CalculadoraRTC.Utils.JSON;
 
 type
-  TTrechoPedagioInput = class
-  private
-    fpNumero: Integer;
-    fpCodigoMunicipio: Int64;
-    fpUF: string;
-    fpExtensao: Double; // em km
-  public
-    function Numero(const AValue: Integer): TTrechoPedagioInput;
-    function CodigoMunicipio(const AValue: Int64): TTrechoPedagioInput;
-    function UF(const AValue: string): TTrechoPedagioInput;
-    function Extensao(const AKm: Double): TTrechoPedagioInput;
-
+  ITrechoPedagioInput = interface
+    ['{0C6A9A8E-7E2D-4939-A9A5-5D0B7D39D4C2}']
+    function Numero(const AValue: Integer): ITrechoPedagioInput;
+    function Municipio(const ACodigoIBGE: Int64): ITrechoPedagioInput;
+    function UF(const AUF: string): ITrechoPedagioInput;
+    function Extensao(const AKm: Double): ITrechoPedagioInput;
     function ToJSON: TJSONObject;
   end;
 
-  TTrechosPedagioInput = class(specialize TFPGObjectList<TTrechoPedagioInput>)
+  IPedagioInput = interface
+    ['{E431BF62-83D2-4AC7-8D52-7C6D0D9E6B0E}']
+    function DataHoraEmissaoISO(const AISO: string): IPedagioInput;
+    function CodigoMunicipioOrigem(const ACod: Int64): IPedagioInput;
+    function UFMunicipioOrigem(const AUF: string): IPedagioInput;
+    function CST(const ACst: string): IPedagioInput;
+    function BaseCalculo(const AValue: Double): IPedagioInput;
+    function CClassTrib(const ACode: string): IPedagioInput;
+    function AddTrecho: ITrechoPedagioInput;
+    function ToJSON: TJSONObject;
   end;
 
-  TPedagioInput = class
+  ITributoPedagioOutput = interface
+    ['{2E4E6079-4A3D-4B8A-8C37-0E8A4E4B46A0}']
+    function Aliquota: Double;
+    function AliquotaEfetiva: Double;
+    function TributoCalculado: Double;
+    function MemoriaCalculo: string;
+  end;
+
+  ITributoTotalPedagioOutput = interface
+    ['{3B1B7C65-7D40-4F92-9C8D-7C7C2B8D8E11}']
+    function BaseCalculo: Double;
+    function ValorApurado: Double;
+    function ValorDevido: Double;
+    function ValorTributo: Double;
+    function TotalMontanteDesonerado: Double;
+  end;
+
+  ITrechoPedagioOutput = interface
+    ['{D9B7D498-4C2B-4B12-8B79-9D292C6B5E64}']
+    function Numero: Integer;
+    function Municipio: Int64;
+    function UF: string;
+    function BaseCalculo: Double;
+    function ExtensaoTrecho: Double;
+    function ExtensaoTotal: Double;
+    function CBS: ITributoPedagioOutput;
+    function IBSEstadual: ITributoPedagioOutput;
+    function IBSMunicipal: ITributoPedagioOutput;
+  end;
+
+  ITotalPedagioOutput = interface
+    ['{F93A730E-73B6-4A84-9E5D-6C9B7F9D99E0}']
+    function CbsTotal: ITributoTotalPedagioOutput;
+    function IbsEstadualTotal: ITributoTotalPedagioOutput;
+    function IbsMunicipalTotal: ITributoTotalPedagioOutput;
+  end;
+
+  IPedagioOutput = interface
+    ['{2C0F5C0B-7D88-4E8D-8B77-9C9E6E2B4B5A}']
+    function DataHoraEmissao: string;
+    function MunicipioOrigem: Int64;
+    function UFMunicipioOrigem: string;
+    function CST: string;
+    function BaseCalculo: Double;
+    function ExtensaoTotal: Double;
+    function TrechosCount: Integer;
+    function TrechoByIndex(const Idx: Integer): ITrechoPedagioOutput;
+    function Total: ITotalPedagioOutput;
+    function CClassTrib: string;
+  end;
+
+  { Inputs }
+
+  TTrechoPedagioInput = class(TInterfacedObject, ITrechoPedagioInput)
   private
-    fpDataHoraEmissao: string; // ISO-8601 (preferencialmente com TZ)
+    fpNumero: Integer;
+    fpMunicipio: Int64;
+    fpUF: string;
+    fpExtensao: Double;
+  public
+    class function New: ITrechoPedagioInput; static;
+
+    { ITrechoPedagioInput }
+    function Numero(const AValue: Integer): ITrechoPedagioInput;
+    function Municipio(const ACodigoIBGE: Int64): ITrechoPedagioInput;
+    function UF(const AUF: string): ITrechoPedagioInput;
+    function Extensao(const AKm: Double): ITrechoPedagioInput;
+    function ToJSON: TJSONObject;
+  end;
+
+  TPergTrechos = specialize TFPGList<ITrechoPedagioInput>;
+
+  TPedagioInput = class(TInterfacedObject, IPedagioInput)
+  private
+    fpDataHoraEmissao: string;
     fpCodigoMunicipioOrigem: Int64;
     fpUFMunicipioOrigem: string;
     fpCST: string;
     fpBaseCalculo: Double;
     fpCClassTrib: string;
-    fpTrechos: TTrechosPedagioInput;
+    fpTrechos: TPergTrechos;
   public
     constructor Create;
     destructor Destroy; override;
+    class function New: IPedagioInput; static;
 
-    function DataHoraEmissaoISO(const AISO: string): TPedagioInput;
-    function DataHoraEmissao(const AWhen: TDateTime; const ATZOffsetMinutes: Integer = 0): TPedagioInput;
-    function CodigoMunicipioOrigem(const AValue: Int64): TPedagioInput;
-    function UFMunicipioOrigem(const AValue: string): TPedagioInput;
-    function CST(const AValue: string): TPedagioInput;
-    function BaseCalculo(const AValue: Double): TPedagioInput;
-    function CClassTrib(const AValue: string): TPedagioInput;
-    function AddTrecho: TTrechoPedagioInput;
-
+    { IPedagioInput }
+    function DataHoraEmissaoISO(const AISO: string): IPedagioInput;
+    function CodigoMunicipioOrigem(const ACod: Int64): IPedagioInput;
+    function UFMunicipioOrigem(const AUF: string): IPedagioInput;
+    function CST(const ACst: string): IPedagioInput;
+    function BaseCalculo(const AValue: Double): IPedagioInput;
+    function CClassTrib(const ACode: string): IPedagioInput;
+    function AddTrecho: ITrechoPedagioInput;
     function ToJSON: TJSONObject;
-
-    property Trechos: TTrechosPedagioInput read fpTrechos;
   end;
 
-  TTributoPedagioOutput = class
+  { Outputs }
+
+  TTributoPedagioOutput = class(TInterfacedObject, ITributoPedagioOutput)
   private
     fpAliquota: Double;
     fpAliquotaEfetiva: Double;
     fpTributoCalculado: Double;
     fpMemoriaCalculo: string;
   public
-    class function FromJSON(AObj: TJSONObject): TTributoPedagioOutput;
+    class function FromJSON(AObj: TJSONObject): ITributoPedagioOutput; static;
 
-    property Aliquota: Double read fpAliquota write fpAliquota;
-    property AliquotaEfetiva: Double read fpAliquotaEfetiva write fpAliquotaEfetiva;
-    property TributoCalculado: Double read fpTributoCalculado write fpTributoCalculado;
-    property MemoriaCalculo: string read fpMemoriaCalculo write fpMemoriaCalculo;
+    { ITributoPedagioOutput }
+    function Aliquota: Double;
+    function AliquotaEfetiva: Double;
+    function TributoCalculado: Double;
+    function MemoriaCalculo: string;
   end;
 
-  TTributoTotalPedagioOutput = class
+  TTributoTotalPedagioOutput = class(TInterfacedObject, ITributoTotalPedagioOutput)
   private
-    fpAliquotaTotal: Double;
-    fpAliquotaEfetivaTotal: Double;
-    fpTributoTotal: Double;
+    fpBaseCalculo: Double;
+    fpValorApurado: Double;
+    fpValorDevido: Double;
+    fpValorTributo: Double;
+    fpTotalMontanteDesonerado: Double;
   public
-    class function FromJSON(AObj: TJSONObject): TTributoTotalPedagioOutput;
+    class function FromJSON(AObj: TJSONObject): ITributoTotalPedagioOutput; static;
 
-    property AliquotaTotal: Double read fpAliquotaTotal write fpAliquotaTotal;
-    property AliquotaEfetivaTotal: Double read fpAliquotaEfetivaTotal write fpAliquotaEfetivaTotal;
-    property TributoTotal: Double read fpTributoTotal write fpTributoTotal;
+    { ITributoTotalPedagioOutput }
+    function BaseCalculo: Double;
+    function ValorApurado: Double;
+    function ValorDevido: Double;
+    function ValorTributo: Double;
+    function TotalMontanteDesonerado: Double;
   end;
 
-  TTrechoPedagioOutput = class
+  TTrechoPedagioOutput = class(TInterfacedObject, ITrechoPedagioOutput)
   private
     fpNumero: Integer;
     fpMunicipio: Int64;
     fpUF: string;
-    fpExtensao: Double;
-
-    fpCBS: TTributoPedagioOutput;
-    fpIBSEstadual: TTributoPedagioOutput;
-    fpIBSMunicipal: TTributoPedagioOutput;
+    fpBaseCalculo: Double;
+    fpExtensaoTrecho: Double;
+    fpExtensaoTotal: Double;
+    fpCBS: ITributoPedagioOutput;
+    fpIBSEstadual: ITributoPedagioOutput;
+    fpIBSMunicipal: ITributoPedagioOutput;
   public
-    destructor Destroy; override;
-    class function FromJSON(AObj: TJSONObject): TTrechoPedagioOutput;
+    class function FromJSON(AObj: TJSONObject): ITrechoPedagioOutput; static;
 
-    property Numero: Integer read fpNumero write fpNumero;
-    property Municipio: Int64 read fpMunicipio write fpMunicipio;
-    property UF: string read fpUF write fpUF;
-    property Extensao: Double read fpExtensao write fpExtensao;
-
-    property CBS: TTributoPedagioOutput read fpCBS write fpCBS;
-    property IBSEstadual: TTributoPedagioOutput read fpIBSEstadual write fpIBSEstadual;
-    property IBSMunicipal: TTributoPedagioOutput read fpIBSMunicipal write fpIBSMunicipal;
+    { ITrechoPedagioOutput }
+    function Numero: Integer;
+    function Municipio: Int64;
+    function UF: string;
+    function BaseCalculo: Double;
+    function ExtensaoTrecho: Double;
+    function ExtensaoTotal: Double;
+    function CBS: ITributoPedagioOutput;
+    function IBSEstadual: ITributoPedagioOutput;
+    function IBSMunicipal: ITributoPedagioOutput;
   end;
 
-  TTrechosPedagioOutput = class(specialize TFPGObjectList<TTrechoPedagioOutput>)
-  end;
-
-  TPedagioOutput = class
+  TTotalPedagioOutput = class(TInterfacedObject, ITotalPedagioOutput)
   private
-    fpTrechos: TTrechosPedagioOutput;
-    fpCBSTotal: TTributoTotalPedagioOutput;
-    fpIBSEstadualTotal: TTributoTotalPedagioOutput;
-    fpIBSMunicipalTotal: TTributoTotalPedagioOutput;
+    fpCbsTotal: ITributoTotalPedagioOutput;
+    fpIbsEstadualTotal: ITributoTotalPedagioOutput;
+    fpIbsMunicipalTotal: ITributoTotalPedagioOutput;
   public
-    constructor Create;
-    destructor Destroy; override;
-    class function FromJSON(AJson: TJSONData): TPedagioOutput;
+    class function FromJSON(AObj: TJSONObject): ITotalPedagioOutput; static;
 
-    property Trechos: TTrechosPedagioOutput read fpTrechos;
-    property CBSTotal: TTributoTotalPedagioOutput read fpCBSTotal write fpCBSTotal;
-    property IBSEstadualTotal: TTributoTotalPedagioOutput read fpIBSEstadualTotal write fpIBSEstadualTotal;
-    property IBSMunicipalTotal: TTributoTotalPedagioOutput read fpIBSMunicipalTotal write fpIBSMunicipalTotal;
+    { ITotalPedagioOutput }
+    function CbsTotal: ITributoTotalPedagioOutput;
+    function IbsEstadualTotal: ITributoTotalPedagioOutput;
+    function IbsMunicipalTotal: ITributoTotalPedagioOutput;
+  end;
+
+  TPedagioOutput = class(TInterfacedObject, IPedagioOutput)
+  private
+    fpDataHoraEmissao: string;
+    fpMunicipioOrigem: Int64;
+    fpUFMunicipioOrigem: string;
+    fpCST: string;
+    fpBaseCalculo: Double;
+    fpExtensaoTotal: Double;
+    fpTrechos: array of ITrechoPedagioOutput;
+    fpTotal: ITotalPedagioOutput;
+    fpCClassTrib: string;
+  public
+    class function FromJSON(AJson: TJSONData): IPedagioOutput; static;
+
+    { IPedagioOutput }
+    function DataHoraEmissao: string;
+    function MunicipioOrigem: Int64;
+    function UFMunicipioOrigem: string;
+    function CST: string;
+    function BaseCalculo: Double;
+    function ExtensaoTotal: Double;
+    function TrechosCount: Integer;
+    function TrechoByIndex(const Idx: Integer): ITrechoPedagioOutput;
+    function Total: ITotalPedagioOutput;
+    function CClassTrib: string;
   end;
 
 implementation
 
-{ TTrechoPedagioInput }
+class function TTrechoPedagioInput.New: ITrechoPedagioInput;
+begin
+  Result := TTrechoPedagioInput.Create;
+end;
 
-function TTrechoPedagioInput.Numero(const AValue: Integer): TTrechoPedagioInput;
+function TTrechoPedagioInput.Numero(const AValue: Integer): ITrechoPedagioInput;
 begin
   fpNumero := AValue;
   Result := Self;
 end;
 
-function TTrechoPedagioInput.CodigoMunicipio(const AValue: Int64): TTrechoPedagioInput;
+function TTrechoPedagioInput.Municipio(const ACodigoIBGE: Int64): ITrechoPedagioInput;
 begin
-  fpCodigoMunicipio := AValue;
+  fpMunicipio := ACodigoIBGE;
   Result := Self;
 end;
 
-function TTrechoPedagioInput.UF(const AValue: string): TTrechoPedagioInput;
+function TTrechoPedagioInput.UF(const AUF: string): ITrechoPedagioInput;
 begin
-  fpUF := AValue;
+  fpUF := AUF;
   Result := Self;
 end;
 
-function TTrechoPedagioInput.Extensao(const AKm: Double): TTrechoPedagioInput;
+function TTrechoPedagioInput.Extensao(const AKm: Double): ITrechoPedagioInput;
 begin
   fpExtensao := AKm;
   Result := Self;
@@ -160,77 +266,74 @@ function TTrechoPedagioInput.ToJSON: TJSONObject;
 begin
   Result := TJSONObject.Create;
   Result.Add('numero', fpNumero);
-  Result.Add('municipio', fpCodigoMunicipio);
+  Result.Add('municipio', fpMunicipio);
   Result.Add('uf', fpUF);
   Result.Add('extensao', JFloat(fpExtensao));
 end;
 
-{ TPedagioInput }
-
 constructor TPedagioInput.Create;
 begin
   inherited Create;
-  fpTrechos := TTrechosPedagioInput.Create(True);
+  fpTrechos := TPergTrechos.Create;
 end;
 
 destructor TPedagioInput.Destroy;
 begin
-  fpTrechos.Free;
+  fpTrechos.Free; // armazena interfaces; sem double-free
   inherited Destroy;
 end;
 
-function TPedagioInput.DataHoraEmissaoISO(const AISO: string): TPedagioInput;
+class function TPedagioInput.New: IPedagioInput;
+begin
+  Result := TPedagioInput.Create;
+end;
+
+function TPedagioInput.DataHoraEmissaoISO(const AISO: string): IPedagioInput;
 begin
   fpDataHoraEmissao := AISO;
   Result := Self;
 end;
 
-function TPedagioInput.DataHoraEmissao(const AWhen: TDateTime; const ATZOffsetMinutes: Integer): TPedagioInput;
+function TPedagioInput.CodigoMunicipioOrigem(const ACod: Int64): IPedagioInput;
 begin
-  fpDataHoraEmissao := DateTimeToISO8601TZ(AWhen, ATZOffsetMinutes);
+  fpCodigoMunicipioOrigem := ACod;
   Result := Self;
 end;
 
-function TPedagioInput.CodigoMunicipioOrigem(const AValue: Int64): TPedagioInput;
+function TPedagioInput.UFMunicipioOrigem(const AUF: string): IPedagioInput;
 begin
-  fpCodigoMunicipioOrigem := AValue;
+  fpUFMunicipioOrigem := AUF;
   Result := Self;
 end;
 
-function TPedagioInput.UFMunicipioOrigem(const AValue: string): TPedagioInput;
+function TPedagioInput.CST(const ACst: string): IPedagioInput;
 begin
-  fpUFMunicipioOrigem := AValue;
+  fpCST := ACst;
   Result := Self;
 end;
 
-function TPedagioInput.CST(const AValue: string): TPedagioInput;
-begin
-  fpCST := AValue;
-  Result := Self;
-end;
-
-function TPedagioInput.BaseCalculo(const AValue: Double): TPedagioInput;
+function TPedagioInput.BaseCalculo(const AValue: Double): IPedagioInput;
 begin
   fpBaseCalculo := AValue;
   Result := Self;
 end;
 
-function TPedagioInput.CClassTrib(const AValue: string): TPedagioInput;
+function TPedagioInput.CClassTrib(const ACode: string): IPedagioInput;
 begin
-  fpCClassTrib := AValue;
+  fpCClassTrib := ACode;
   Result := Self;
 end;
 
-function TPedagioInput.AddTrecho: TTrechoPedagioInput;
+function TPedagioInput.AddTrecho: ITrechoPedagioInput;
 begin
-  Result := TTrechoPedagioInput.Create;
+  Result := TTrechoPedagioInput.New;
   fpTrechos.Add(Result);
 end;
 
 function TPedagioInput.ToJSON: TJSONObject;
 var
   LArr: TJSONArray;
-  LIt: TTrechoPedagioInput;
+  I: Integer;
 begin
   Result := TJSONObject.Create;
   Result.Add('dataHoraEmissao', fpDataHoraEmissao);
@@ -241,124 +344,278 @@ begin
   Result.Add('cClassTrib', fpCClassTrib);
 
   LArr := TJSONArray.Create;
-  for LIt in fpTrechos do
-    LArr.Add(LIt.ToJSON);
+  for I := 0 to fpTrechos.Count - 1 do
+    LArr.Add(fpTrechos[I].ToJSON);
   Result.Add('trechos', LArr);
 end;
 
-{ TTributoPedagioOutput }
-
-class function TTributoPedagioOutput.FromJSON(AObj: TJSONObject): TTributoPedagioOutput;
-begin
-  Result := TTributoPedagioOutput.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpAliquota := JSONGetFloat(AObj, 'aliquota');
-  Result.fpAliquotaEfetiva := JSONGetFloat(AObj, 'aliquotaEfetiva');
-  Result.fpTributoCalculado := JSONGetFloat(AObj, 'tributoCalculado');
-  Result.fpMemoriaCalculo := AObj.Get('memoriaCalculo', '');
-end;
-
-{ TTributoTotalPedagioOutput }
-
-class function TTributoTotalPedagioOutput.FromJSON(AObj: TJSONObject): TTributoTotalPedagioOutput;
-begin
-  Result := TTributoTotalPedagioOutput.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpAliquotaTotal := JSONGetFloat(AObj, 'aliquotaTotal');
-  Result.fpAliquotaEfetivaTotal := JSONGetFloat(AObj, 'aliquotaEfetivaTotal');
-  Result.fpTributoTotal := JSONGetFloat(AObj, 'tributoTotal');
-end;
-
-{ TTrechoPedagioOutput }
-
-destructor TTrechoPedagioOutput.Destroy;
-begin
-  fpCBS.Free;
-  fpIBSEstadual.Free;
-  fpIBSMunicipal.Free;
-  inherited Destroy;
-end;
-
-class function TTrechoPedagioOutput.FromJSON(AObj: TJSONObject): TTrechoPedagioOutput;
+class function TTributoPedagioOutput.FromJSON(AObj: TJSONObject): ITributoPedagioOutput;
 var
-  LObj: TJSONObject;
+  L: TTributoPedagioOutput;
 begin
-  Result := TTrechoPedagioOutput.Create;
-  if AObj = nil then
-    Exit;
-
-  Result.fpNumero := JSONGetInt(AObj, 'numero');
-  Result.fpMunicipio := JSONGetInt64(AObj, 'municipio');
-  Result.fpUF := AObj.Get('uf', '');
-  Result.fpExtensao := JSONGetFloat(AObj, 'extensao');
-
-  LObj := AObj.Find('cbs') as TJSONObject;
-  if LObj <> nil then
-    Result.fpCBS := TTributoPedagioOutput.FromJSON(LObj);
-
-  LObj := AObj.Find('ibsEstadual') as TJSONObject;
-  if LObj <> nil then
-    Result.fpIBSEstadual := TTributoPedagioOutput.FromJSON(LObj);
-
-  LObj := AObj.Find('ibsMunicipal') as TJSONObject;
-  if LObj <> nil then
-    Result.fpIBSMunicipal := TTributoPedagioOutput.FromJSON(LObj);
+  if AObj = nil then Exit(nil);
+  L := TTributoPedagioOutput.Create;
+  L.fpAliquota := JSONGetFloat(AObj, 'aliquota');
+  L.fpAliquotaEfetiva := JSONGetFloat(AObj, 'aliquotaEfetiva');
+  L.fpTributoCalculado := JSONGetFloat(AObj, 'tributoCalculado');
+  L.fpMemoriaCalculo := JSONGetString(AObj, 'memoriaCalculo','');
+  Result := L;
 end;
 
-{ TPedagioOutput }
-
-constructor TPedagioOutput.Create;
+function TTributoPedagioOutput.Aliquota: Double;
 begin
-  inherited Create;
-  fpTrechos := TTrechosPedagioOutput.Create(True);
+  Result := fpAliquota;
 end;
 
-destructor TPedagioOutput.Destroy;
+function TTributoPedagioOutput.AliquotaEfetiva: Double;
 begin
-  fpTrechos.Free;
-  fpCBSTotal.Free;
-  fpIBSEstadualTotal.Free;
-  fpIBSMunicipalTotal.Free;
-  inherited Destroy;
+  Result := fpAliquotaEfetiva;
 end;
 
-class function TPedagioOutput.FromJSON(AJson: TJSONData): TPedagioOutput;
+function TTributoPedagioOutput.TributoCalculado: Double;
+begin
+  Result := fpTributoCalculado;
+end;
+
+function TTributoPedagioOutput.MemoriaCalculo: string;
+begin
+  Result := fpMemoriaCalculo;
+end;
+
+class function TTributoTotalPedagioOutput.FromJSON(AObj: TJSONObject): ITributoTotalPedagioOutput;
+var
+  L: TTributoTotalPedagioOutput;
+begin
+  if AObj = nil then Exit(nil);
+  L := TTributoTotalPedagioOutput.Create;
+  L.fpBaseCalculo := JSONGetFloat(AObj, 'baseCalculo');
+  L.fpValorApurado := JSONGetFloat(AObj, 'valorApurado');
+  L.fpValorDevido := JSONGetFloat(AObj, 'valorDevido');
+  L.fpValorTributo := JSONGetFloat(AObj, 'valorTributo');
+  L.fpTotalMontanteDesonerado := JSONGetFloat(AObj, 'totalMontanteDesonerado');
+  Result := L;
+end;
+
+function TTributoTotalPedagioOutput.BaseCalculo: Double;
+begin
+  Result := fpBaseCalculo;
+end;
+
+function TTributoTotalPedagioOutput.ValorApurado: Double;
+begin
+  Result := fpValorApurado;
+end;
+
+function TTributoTotalPedagioOutput.ValorDevido: Double;
+begin
+  Result := fpValorDevido;
+end;
+
+function TTributoTotalPedagioOutput.ValorTributo: Double;
+begin
+  Result := fpValorTributo;
+end;
+
+function TTributoTotalPedagioOutput.TotalMontanteDesonerado: Double;
+begin
+  Result := fpTotalMontanteDesonerado;
+end;
+
+class function TTrechoPedagioOutput.FromJSON(AObj: TJSONObject): ITrechoPedagioOutput;
+var
+  L: TTrechoPedagioOutput;
+  LO: TJSONObject;
+begin
+  if AObj = nil then Exit(nil);
+  L := TTrechoPedagioOutput.Create;
+  L.fpNumero := JSONGetInt(AObj, 'numero');
+  L.fpMunicipio := JSONGetInt64(AObj, 'municipio');
+  L.fpUF := JSONGetString(AObj, 'uf','');
+  L.fpBaseCalculo := JSONGetFloat(AObj, 'baseCalculo');
+  L.fpExtensaoTrecho := JSONGetFloat(AObj, 'extensaoTrecho');
+  L.fpExtensaoTotal := JSONGetFloat(AObj, 'extensaoTotal');
+
+  LO := AObj.Find('cbs') as TJSONObject;
+  if LO <> nil then L.fpCBS := TTributoPedagioOutput.FromJSON(LO);
+
+  LO := AObj.Find('ibsEstadual') as TJSONObject;
+  if LO <> nil then L.fpIBSEstadual := TTributoPedagioOutput.FromJSON(LO);
+
+  LO := AObj.Find('ibsMunicipal') as TJSONObject;
+  if LO <> nil then L.fpIBSMunicipal := TTributoPedagioOutput.FromJSON(LO);
+
+  Result := L;
+end;
+
+function TTrechoPedagioOutput.Numero: Integer;
+begin
+  Result := fpNumero;
+end;
+
+function TTrechoPedagioOutput.Municipio: Int64;
+begin
+  Result := fpMunicipio;
+end;
+
+function TTrechoPedagioOutput.UF: string;
+begin
+  Result := fpUF;
+end;
+
+function TTrechoPedagioOutput.BaseCalculo: Double;
+begin
+  Result := fpBaseCalculo;
+end;
+
+function TTrechoPedagioOutput.ExtensaoTrecho: Double;
+begin
+  Result := fpExtensaoTrecho;
+end;
+
+function TTrechoPedagioOutput.ExtensaoTotal: Double;
+begin
+  Result := fpExtensaoTotal;
+end;
+
+function TTrechoPedagioOutput.CBS: ITributoPedagioOutput;
+begin
+  Result := fpCBS;
+end;
+
+function TTrechoPedagioOutput.IBSEstadual: ITributoPedagioOutput;
+begin
+  Result := fpIBSEstadual;
+end;
+
+function TTrechoPedagioOutput.IBSMunicipal: ITributoPedagioOutput;
+begin
+  Result := fpIBSMunicipal;
+end;
+
+class function TTotalPedagioOutput.FromJSON(AObj: TJSONObject): ITotalPedagioOutput;
+var
+  L: TTotalPedagioOutput;
+  LO: TJSONObject;
+begin
+  if AObj = nil then Exit(nil);
+  L := TTotalPedagioOutput.Create;
+
+  LO := AObj.Find('cbsTotal') as TJSONObject;
+  if LO <> nil then L.fpCbsTotal := TTributoTotalPedagioOutput.FromJSON(LO);
+
+  LO := AObj.Find('ibsEstadualTotal') as TJSONObject;
+  if LO <> nil then L.fpIbsEstadualTotal := TTributoTotalPedagioOutput.FromJSON(LO);
+
+  LO := AObj.Find('ibsMunicipalTotal') as TJSONObject;
+  if LO <> nil then L.fpIbsMunicipalTotal := TTributoTotalPedagioOutput.FromJSON(LO);
+
+  Result := L;
+end;
+
+function TTotalPedagioOutput.CbsTotal: ITributoTotalPedagioOutput;
+begin
+  Result := fpCbsTotal;
+end;
+
+function TTotalPedagioOutput.IbsEstadualTotal: ITributoTotalPedagioOutput;
+begin
+  Result := fpIbsEstadualTotal;
+end;
+
+function TTotalPedagioOutput.IbsMunicipalTotal: ITributoTotalPedagioOutput;
+begin
+  Result := fpIbsMunicipalTotal;
+end;
+
+class function TPedagioOutput.FromJSON(AJson: TJSONData): IPedagioOutput;
 var
   LObj: TJSONObject;
   LArr: TJSONArray;
   I: Integer;
   LT: TJSONObject;
-  LItem: TTrechoPedagioOutput;
+  L: TPedagioOutput;
 begin
-  Result := TPedagioOutput.Create;
-  if (AJson = nil) or (AJson.JSONType <> jtObject) then
-    Exit;
+  if (AJson = nil) or (AJson.JSONType <> jtObject) then Exit(nil);
 
+  L := TPedagioOutput.Create;
   LObj := TJSONObject(AJson);
+
+  L.fpDataHoraEmissao := JSONGetString(LObj, 'dataHoraEmissao','');
+  L.fpMunicipioOrigem := JSONGetInt64(LObj, 'municipioOrigem');
+  L.fpUFMunicipioOrigem := JSONGetString(LObj, 'ufMunicipioOrigem','');
+  L.fpCST := JSONGetString(LObj, 'cst','');
+  L.fpBaseCalculo := JSONGetFloat(LObj, 'baseCalculo');
+  L.fpExtensaoTotal := JSONGetFloat(LObj, 'extensaoTotal');
+  L.fpCClassTrib := JSONGetString(LObj, 'cClassTrib','');
 
   LArr := LObj.Find('trechos') as TJSONArray;
   if LArr <> nil then
   begin
+    SetLength(L.fpTrechos, LArr.Count);
     for I := 0 to LArr.Count - 1 do
     begin
       LT := LArr.Objects[I];
-      LItem := TTrechoPedagioOutput.FromJSON(LT);
-      Result.fpTrechos.Add(LItem);
+      L.fpTrechos[I] := TTrechoPedagioOutput.FromJSON(LT);
     end;
   end;
 
-  if LObj.Find('cbsTotal') <> nil then
-    Result.fpCBSTotal := TTributoTotalPedagioOutput.FromJSON(LObj.Objects['cbsTotal']);
+  if LObj.Find('total') <> nil then
+    L.fpTotal := TTotalPedagioOutput.FromJSON(LObj.Objects['total']);
 
-  if LObj.Find('ibsEstadualTotal') <> nil then
-    Result.fpIBSEstadualTotal := TTributoTotalPedagioOutput.FromJSON(LObj.Objects['ibsEstadualTotal']);
+  Result := L;
+end;
 
-  if LObj.Find('ibsMunicipalTotal') <> nil then
-    Result.fpIBSMunicipalTotal := TTributoTotalPedagioOutput.FromJSON(LObj.Objects['ibsMunicipalTotal']);
+function TPedagioOutput.DataHoraEmissao: string;
+begin
+  Result := fpDataHoraEmissao;
+end;
+
+function TPedagioOutput.MunicipioOrigem: Int64;
+begin
+  Result := fpMunicipioOrigem;
+end;
+
+function TPedagioOutput.UFMunicipioOrigem: string;
+begin
+  Result := fpUFMunicipioOrigem;
+end;
+
+function TPedagioOutput.CST: string;
+begin
+  Result := fpCST;
+end;
+
+function TPedagioOutput.BaseCalculo: Double;
+begin
+  Result := fpBaseCalculo;
+end;
+
+function TPedagioOutput.ExtensaoTotal: Double;
+begin
+  Result := fpExtensaoTotal;
+end;
+
+function TPedagioOutput.TrechosCount: Integer;
+begin
+  Result := Length(fpTrechos);
+end;
+
+function TPedagioOutput.TrechoByIndex(const Idx: Integer): ITrechoPedagioOutput;
+begin
+  if (Idx < 0) or (Idx >= Length(fpTrechos)) then
+    Exit(nil);
+  Result := fpTrechos[Idx];
+end;
+
+function TPedagioOutput.Total: ITotalPedagioOutput;
+begin
+  Result := fpTotal;
+end;
+
+function TPedagioOutput.CClassTrib: string;
+begin
+  Result := fpCClassTrib;
 end;
 
 end.
+

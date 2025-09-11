@@ -1,0 +1,602 @@
+object FormCalcDemo: TFormCalcDemo
+  Left = 424
+  Height = 720
+  Top = 117
+  Width = 1100
+  Caption = 'CalculadoraRTC - Demo'
+  ClientHeight = 720
+  ClientWidth = 1100
+  OnCreate = FormCreate
+  LCLVersion = '3.2.0.0'
+  object pnlConfig: TGroupBox
+    Left = 8
+    Height = 96
+    Top = 8
+    Width = 520
+    Caption = 'Config'
+    ClientHeight = 76
+    ClientWidth = 516
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 8
+      Height = 15
+      Top = 20
+      Width = 48
+      Caption = 'Base URL'
+    end
+    object Label2: TLabel
+      Left = 8
+      Height = 15
+      Top = 52
+      Width = 72
+      Caption = 'Timeout (ms)'
+    end
+    object Label3: TLabel
+      Left = 220
+      Height = 15
+      Top = 52
+      Width = 60
+      Caption = 'User-Agent'
+    end
+    object edtBaseUrl: TEdit
+      Left = 90
+      Height = 23
+      Top = 16
+      Width = 410
+      TabOrder = 0
+    end
+    object edtTimeout: TEdit
+      Left = 90
+      Height = 23
+      Top = 48
+      Width = 120
+      TabOrder = 1
+    end
+    object edtUserAgent: TEdit
+      Left = 288
+      Height = 23
+      Top = 48
+      Width = 212
+      TabOrder = 2
+    end
+  end
+  object pnlOperacao: TGroupBox
+    Left = 8
+    Height = 248
+    Top = 112
+    Width = 520
+    Caption = 'Operação / Item'
+    ClientHeight = 228
+    ClientWidth = 516
+    TabOrder = 1
+    object Label4: TLabel
+      Left = 8
+      Height = 15
+      Top = 20
+      Width = 10
+      Caption = 'Id'
+    end
+    object Label5: TLabel
+      Left = 260
+      Height = 15
+      Top = 20
+      Width = 34
+      Caption = 'Versão'
+    end
+    object Label6: TLabel
+      Left = 8
+      Height = 15
+      Top = 52
+      Width = 54
+      Caption = 'Município'
+    end
+    object Label7: TLabel
+      Left = 260
+      Height = 15
+      Top = 52
+      Width = 14
+      Caption = 'UF'
+    end
+    object Label8: TLabel
+      Left = 8
+      Height = 15
+      Top = 84
+      Width = 88
+      Caption = 'cClassTrib (item)'
+    end
+    object Label9: TLabel
+      Left = 260
+      Height = 15
+      Top = 84
+      Width = 56
+      Caption = 'CST (item)'
+    end
+    object Label10: TLabel
+      Left = 8
+      Height = 15
+      Top = 116
+      Width = 28
+      Caption = 'NCM'
+    end
+    object Label11: TLabel
+      Left = 260
+      Height = 15
+      Top = 116
+      Width = 22
+      Caption = 'NBS'
+    end
+    object Label12: TLabel
+      Left = 8
+      Height = 15
+      Top = 148
+      Width = 102
+      Caption = 'Base Cálculo (item)'
+    end
+    object Label13: TLabel
+      Left = 260
+      Height = 15
+      Top = 148
+      Width = 20
+      Caption = 'Qtd'
+    end
+    object Label14: TLabel
+      Left = 380
+      Height = 15
+      Top = 148
+      Width = 15
+      Caption = 'Un'
+    end
+    object edtId: TEdit
+      Left = 90
+      Height = 23
+      Top = 16
+      Width = 160
+      TabOrder = 0
+    end
+    object edtVersao: TEdit
+      Left = 320
+      Height = 23
+      Top = 16
+      Width = 180
+      TabOrder = 1
+    end
+    object edtMunicipio: TEdit
+      Left = 90
+      Height = 23
+      Top = 48
+      Width = 160
+      TabOrder = 2
+    end
+    object edtUF: TEdit
+      Left = 320
+      Height = 23
+      Top = 48
+      Width = 60
+      TabOrder = 3
+    end
+    object edtCClassTribItem: TEdit
+      Left = 90
+      Height = 23
+      Top = 80
+      Width = 160
+      TabOrder = 4
+    end
+    object edtCSTItem: TEdit
+      Left = 320
+      Height = 23
+      Top = 80
+      Width = 180
+      TabOrder = 5
+    end
+    object edtNCM: TEdit
+      Left = 90
+      Height = 23
+      Top = 112
+      Width = 160
+      TabOrder = 6
+    end
+    object edtNBS: TEdit
+      Left = 320
+      Height = 23
+      Top = 112
+      Width = 180
+      TabOrder = 7
+    end
+    object edtBaseCalculoItem: TEdit
+      Left = 130
+      Height = 23
+      Top = 144
+      Width = 110
+      TabOrder = 8
+    end
+    object edtQtdItem: TEdit
+      Left = 320
+      Height = 23
+      Top = 144
+      Width = 50
+      TabOrder = 9
+    end
+    object edtUnItem: TEdit
+      Left = 410
+      Height = 23
+      Top = 144
+      Width = 90
+      TabOrder = 10
+    end
+    object btnCalcularRegimeGeralJSON: TButton
+      Left = 8
+      Height = 28
+      Top = 180
+      Width = 160
+      Caption = 'Regime Geral (JSON)'
+      TabOrder = 11
+      OnClick = btnCalcularRegimeGeralJSONClick
+    end
+    object btnCalcularRegimeGeralTipado: TButton
+      Left = 176
+      Height = 28
+      Top = 180
+      Width = 180
+      Caption = 'Regime Geral (Tipado)'
+      TabOrder = 12
+      OnClick = btnCalcularRegimeGeralTipadoClick
+    end
+    object btnBaseIS: TButton
+      Left = 362
+      Height = 28
+      Top = 180
+      Width = 70
+      Caption = 'IS'
+      TabOrder = 13
+      OnClick = btnBaseISClick
+    end
+    object btnBaseCIBS: TButton
+      Left = 434
+      Height = 28
+      Top = 180
+      Width = 70
+      Caption = 'CBS/IBS'
+      TabOrder = 14
+      OnClick = btnBaseCIBSClick
+    end
+  end
+  object pnlXML: TGroupBox
+    Left = 8
+    Height = 160
+    Top = 360
+    Width = 1084
+    Caption = 'XML'
+    ClientHeight = 140
+    ClientWidth = 1080
+    TabOrder = 2
+    object Label15: TLabel
+      Left = 8
+      Height = 15
+      Top = 20
+      Width = 24
+      Caption = 'Tipo'
+    end
+    object Label16: TLabel
+      Left = 180
+      Height = 15
+      Top = 20
+      Width = 41
+      Caption = 'Subtipo'
+    end
+    object edtXMLTipo: TEdit
+      Left = 46
+      Height = 23
+      Top = 16
+      Width = 120
+      TabOrder = 0
+      Text = 'nfe'
+    end
+    object edtXMLSubtipo: TEdit
+      Left = 240
+      Height = 23
+      Top = 16
+      Width = 120
+      TabOrder = 1
+      Text = 'grupo'
+    end
+    object btnValidarXML: TButton
+      Left = 370
+      Height = 28
+      Top = 14
+      Width = 65
+      Caption = 'Validar'
+      TabOrder = 2
+      OnClick = btnValidarXMLClick
+    end
+    object btnGerarXML: TButton
+      Left = 440
+      Height = 28
+      Top = 14
+      Width = 70
+      Caption = 'Gerar'
+      TabOrder = 3
+      OnClick = btnGerarXMLClick
+    end
+    object MemoXML: TMemo
+      Left = 8
+      Height = 88
+      Top = 48
+      Width = 1066
+      ScrollBars = ssAutoBoth
+      TabOrder = 4
+    end
+  end
+  object pnlDadosAbertos: TGroupBox
+    Left = 536
+    Height = 352
+    Top = 8
+    Width = 556
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Dados Abertos'
+    ClientHeight = 332
+    ClientWidth = 552
+    TabOrder = 3
+    object Label17: TLabel
+      Left = 8
+      Height = 15
+      Top = 24
+      Width = 51
+      Caption = 'Data Base'
+    end
+    object Label18: TLabel
+      Left = 180
+      Height = 15
+      Top = 24
+      Width = 42
+      Caption = 'Sigla UF'
+    end
+    object Label19: TLabel
+      Left = 260
+      Height = 15
+      Top = 24
+      Width = 56
+      Caption = 'Código UF'
+    end
+    object Label20: TLabel
+      Left = 360
+      Height = 15
+      Top = 24
+      Width = 96
+      Caption = 'Código Município'
+    end
+    object Label21: TLabel
+      Left = 8
+      Height = 15
+      Top = 56
+      Width = 60
+      Caption = 'Id ClassTrib'
+    end
+    object Label22: TLabel
+      Left = 180
+      Height = 15
+      Top = 56
+      Width = 28
+      Caption = 'NCM'
+    end
+    object Label23: TLabel
+      Left = 360
+      Height = 15
+      Top = 56
+      Width = 22
+      Caption = 'NBS'
+    end
+    object edtDataISO: TEdit
+      Left = 70
+      Height = 23
+      Top = 20
+      Width = 100
+      TabOrder = 0
+    end
+    object edtSiglaUF: TEdit
+      Left = 232
+      Height = 23
+      Top = 20
+      Width = 24
+      TabOrder = 1
+    end
+    object edtCodigoUF: TEdit
+      Left = 324
+      Height = 23
+      Top = 20
+      Width = 30
+      TabOrder = 2
+    end
+    object edtCodigoMunicipio: TEdit
+      Left = 460
+      Height = 23
+      Top = 20
+      Width = 80
+      TabOrder = 3
+    end
+    object edtIdClassTrib: TEdit
+      Left = 80
+      Height = 23
+      Top = 52
+      Width = 80
+      TabOrder = 4
+    end
+    object edtNcmQuery: TEdit
+      Left = 212
+      Height = 23
+      Top = 52
+      Width = 120
+      TabOrder = 5
+    end
+    object edtNbsQuery: TEdit
+      Left = 392
+      Height = 23
+      Top = 52
+      Width = 148
+      TabOrder = 6
+    end
+    object btnVersao: TButton
+      Left = 8
+      Height = 28
+      Top = 90
+      Width = 80
+      Caption = 'Versão'
+      TabOrder = 7
+      OnClick = btnVersaoClick
+    end
+    object btnUFs: TButton
+      Left = 92
+      Height = 28
+      Top = 90
+      Width = 80
+      Caption = 'UFs'
+      TabOrder = 8
+      OnClick = btnUFsClick
+    end
+    object btnMunicipiosUF: TButton
+      Left = 176
+      Height = 28
+      Top = 90
+      Width = 120
+      Caption = 'Municípios por UF'
+      TabOrder = 9
+      OnClick = btnMunicipiosUFClick
+    end
+    object btnSTIS: TButton
+      Left = 300
+      Height = 28
+      Top = 90
+      Width = 80
+      Caption = 'ST IS'
+      TabOrder = 10
+      OnClick = btnSTISClick
+    end
+    object btnSTCBSIBS: TButton
+      Left = 384
+      Height = 28
+      Top = 90
+      Width = 100
+      Caption = 'ST CBS/IBS'
+      TabOrder = 11
+      OnClick = btnSTCBSIBSClick
+    end
+    object btnNCM: TButton
+      Left = 8
+      Height = 28
+      Top = 124
+      Width = 80
+      Caption = 'NCM'
+      TabOrder = 12
+      OnClick = btnNCMClick
+    end
+    object btnNBS: TButton
+      Left = 92
+      Height = 28
+      Top = 124
+      Width = 80
+      Caption = 'NBS'
+      TabOrder = 13
+      OnClick = btnNBSClick
+    end
+    object btnFundamentacoes: TButton
+      Left = 176
+      Height = 28
+      Top = 124
+      Width = 140
+      Caption = 'Fundamentações'
+      TabOrder = 14
+      OnClick = btnFundamentacoesClick
+    end
+    object btnClassTribPorId: TButton
+      Left = 320
+      Height = 28
+      Top = 124
+      Width = 110
+      Caption = 'ClassTrib por Id'
+      TabOrder = 15
+      OnClick = btnClassTribPorIdClick
+    end
+    object btnClassTribIS: TButton
+      Left = 432
+      Height = 28
+      Top = 124
+      Width = 112
+      Caption = 'ClassTrib IS'
+      TabOrder = 16
+      OnClick = btnClassTribISClick
+    end
+    object btnClassTribCBSIBS: TButton
+      Left = 8
+      Height = 28
+      Top = 158
+      Width = 150
+      Caption = 'ClassTrib CBS/IBS'
+      TabOrder = 17
+      OnClick = btnClassTribCBSIBSClick
+    end
+    object btnAliqUniao: TButton
+      Left = 162
+      Height = 28
+      Top = 158
+      Width = 90
+      Caption = 'Aliq União'
+      TabOrder = 18
+      OnClick = btnAliqUniaoClick
+    end
+    object btnAliqUF: TButton
+      Left = 256
+      Height = 28
+      Top = 158
+      Width = 90
+      Caption = 'Aliq UF'
+      TabOrder = 19
+      OnClick = btnAliqUFClick
+    end
+    object btnAliqMunicipio: TButton
+      Left = 350
+      Height = 28
+      Top = 158
+      Width = 120
+      Caption = 'Aliq Município'
+      TabOrder = 20
+      OnClick = btnAliqMunicipioClick
+    end
+    object btnPedagio: TButton
+      Left = 472
+      Height = 28
+      Top = 158
+      Width = 72
+      Caption = 'Pedágio'
+      TabOrder = 21
+      OnClick = btnPedagioClick
+    end
+    object MemoROC: TMemo
+      Left = 8
+      Height = 135
+      Top = 194
+      Width = 540
+      Anchors = [akTop, akLeft, akRight]
+      ScrollBars = ssAutoBoth
+      TabOrder = 22
+    end
+  end
+  object pnlLog: TGroupBox
+    Left = 8
+    Height = 180
+    Top = 528
+    Width = 1084
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Caption = 'Log'
+    ClientHeight = 160
+    ClientWidth = 1080
+    TabOrder = 4
+    object MemoLog: TMemo
+      Left = 0
+      Height = 160
+      Top = 0
+      Width = 1080
+      Align = alClient
+      ScrollBars = ssAutoBoth
+      TabOrder = 0
+    end
+  end
+end

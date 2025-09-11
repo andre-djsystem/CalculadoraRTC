@@ -80,3 +80,6 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
+/samples/lazarus/lib/i386-win32
+/samples/lazarus/backup
+*.bak

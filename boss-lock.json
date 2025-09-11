@@ -1,0 +1,14 @@
+{
+	"hash": "d41d8cd98f00b204e9800998ecf8427e",
+	"updated": "2025-09-11T02:11:06.4856257-03:00",
+	"installedModules": {
+		"github.com/viniciussanchez/restrequest4delphi": {
+			"name": "restrequest4delphi",
+			"version": "v4.0.23",
+			"hash": "9c56b6064b12085cf05b0696a11ea6e4",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		}
+	}
+}

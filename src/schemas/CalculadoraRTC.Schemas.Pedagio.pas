@@ -279,7 +279,7 @@ end;
 
 destructor TPedagioInput.Destroy;
 begin
-  fpTrechos.Free; // armazena interfaces; sem double-free
+  fpTrechos.Free;
   inherited Destroy;
 end;
 
@@ -332,7 +332,7 @@ end;
 
 function TPedagioInput.ToJSON: TJSONObject;
 var
-  LArr: TJSONArray;
+  LArr: TJSONArray = nil;
   I: Integer;
 begin
   Result := TJSONObject.Create;
@@ -344,9 +344,13 @@ begin
   Result.Add('cClassTrib', fpCClassTrib);
 
   LArr := TJSONArray.Create;
-  for I := 0 to fpTrechos.Count - 1 do
-    LArr.Add(fpTrechos[I].ToJSON);
-  Result.Add('trechos', LArr);
+  try
+    for I := 0 to fpTrechos.Count - 1 do
+      LArr.Add(fpTrechos[I].ToJSON);
+    Result.Add('trechos', LArr.Clone);
+  finally
+    LArr.Free;
+  end;
 end;
 
 class function TTributoPedagioOutput.FromJSON(AObj: TJSONObject): ITributoPedagioOutput;
@@ -424,7 +428,7 @@ end;
 class function TTrechoPedagioOutput.FromJSON(AObj: TJSONObject): ITrechoPedagioOutput;
 var
   L: TTrechoPedagioOutput;
-  LO: TJSONObject;
+  LO: TJSONObject = nil;
 begin
   if AObj = nil then Exit(nil);
   L := TTrechoPedagioOutput.Create;
@@ -495,7 +499,7 @@ end;
 class function TTotalPedagioOutput.FromJSON(AObj: TJSONObject): ITotalPedagioOutput;
 var
   L: TTotalPedagioOutput;
-  LO: TJSONObject;
+  LO: TJSONObject = nil;
 begin
   if AObj = nil then Exit(nil);
   L := TTotalPedagioOutput.Create;
@@ -529,10 +533,10 @@ end;
 
 class function TPedagioOutput.FromJSON(AJson: TJSONData): IPedagioOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LArr: TJSONArray;
   I: Integer;
-  LT: TJSONObject;
+  LT: TJSONObject = nil;
   L: TPedagioOutput;
 begin
   if (AJson = nil) or (AJson.JSONType <> jtObject) then Exit(nil);

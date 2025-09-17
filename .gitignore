@@ -83,3 +83,5 @@ modules/
 /samples/lazarus/lib/i386-win32
 /samples/lazarus/backup
 *.bak
+*.dbg
+*.trc

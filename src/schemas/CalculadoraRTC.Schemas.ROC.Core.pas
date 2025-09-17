@@ -265,7 +265,7 @@ implementation
 class function TROCTributos.FromJSON(AObj: TJSONObject): IROCTributos;
 var
   LInst: TROCTributos;
-  LSub: TJSONObject;
+  LSub: TJSONObject = nil;
 begin
   LInst := TROCTributos.Create;
 
@@ -305,7 +305,7 @@ end;
 class function TROCObjeto.FromJSON(AObj: TJSONObject): IROCObjeto;
 var
   LInst: TROCObjeto;
-  LSub: TJSONObject;
+  LSub: TJSONObject = nil;
 begin
   LInst := TROCObjeto.Create;
 
@@ -420,7 +420,7 @@ end;
 class function TROCTotalIBS.FromJSON(AObj: TJSONObject): IROCTotalIBS;
 var
   LInst: TROCTotalIBS;
-  LSub: TJSONObject;
+  LSub: TJSONObject = nil;
 begin
   LInst := TROCTotalIBS.Create;
 
@@ -535,7 +535,7 @@ end;
 class function TROCTotalIBSCBS.FromJSON(AObj: TJSONObject): IROCTotalIBSCBS;
 var
   LInst: TROCTotalIBSCBS;
-  LSub: TJSONObject;
+  LSub: TJSONObject = nil;
 begin
   LInst := TROCTotalIBSCBS.Create;
 
@@ -608,7 +608,7 @@ end;
 class function TROCTributosTotais.FromJSON(AObj: TJSONObject): IROCTributosTotais;
 var
   LInst: TROCTributosTotais;
-  LSub: TJSONObject;
+  LSub: TJSONObject = nil;
 begin
   LInst := TROCTributosTotais.Create;
 
@@ -648,7 +648,7 @@ end;
 class function TROCValoresTotais.FromJSON(AObj: TJSONObject): IROCValoresTotais;
 var
   LInst: TROCValoresTotais;
-  LSub: TJSONObject;
+  LSub: TJSONObject = nil;
 begin
   LInst := TROCValoresTotais.Create;
 
@@ -689,12 +689,12 @@ end;
 class function TROC.FromJSON(AJson: TJSONData): IROC;
 var
   LSelf: TROC;
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LArr: TJSONArray;
   I: Integer;
-  LItem: TJSONObject;
+  LItem: TJSONObject = nil;
   LObjeto: IROCObjeto;
-  LTot: TJSONObject;
+  LTot: TJSONObject = nil;
 begin
   LSelf := TROC.Create;
 

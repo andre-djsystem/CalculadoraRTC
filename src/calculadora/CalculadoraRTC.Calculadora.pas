@@ -193,6 +193,7 @@ begin
   Obj.fpBaseUrl := 'https://piloto-cbs.tributos.gov.br/servico/calculadora-consumo/api';
   Obj.fpTimeout := 30000;
   Obj.fpUserAgent := 'CalculadoraRTC/DJSystem';
+  Obj.fpLastResponseJSON := nil;
   Result := Obj; // retorna como interface (com ref counting)
 end;
 
@@ -279,7 +280,10 @@ begin
   fpLastResponseXML := '';
   fpLastStatus := 0;
   if Assigned(fpLastResponseJSON) then
-    FreeAndNil(fpLastResponseJSON);
+  begin
+    fpLastResponseJSON.Free;
+    fpLastResponseJSON := nil;
+  end;
 end;
 
 function TCalculadoraRTCCalculadora.ParseJsonText(const AText: string): TJSONData;
@@ -294,7 +298,7 @@ function TCalculadoraRTCCalculadora.DoPostJSON(const APath: string;
 var
   LResponse: IResponse;
   LUrl: string;
-  LBodyToSend: TJSONObject;
+  LBodyToSend: TJSONObject = nil;
   LErr: TJSONData;
   LDetail: string;
 begin
@@ -408,7 +412,7 @@ begin
   if Assigned(fpLogger) then
     fpLogger.LogJSON('response', fpLastResponseJSON);
 
-  Result := fpLastResponseJSON.Clone;
+  Result := fpLastResponseJSON;
 end;
 
 {=== Endpoints ===}
@@ -425,7 +429,7 @@ end;
 
 function TCalculadoraRTCCalculadora.CalcularISMercadorias(const AInputJson: TJSONObject): TJSONData;
 var
-  LBody: TJSONObject;
+  LBody: TJSONObject = nil;
 begin
   LBody := TJSONObject(AInputJson.Clone);
   try
@@ -438,7 +442,7 @@ end;
 
 function TCalculadoraRTCCalculadora.CalcularCibs(const AInputJson: TJSONObject): TJSONData;
 var
-  LBody: TJSONObject;
+  LBody: TJSONObject = nil;
 begin
   LBody := TJSONObject(AInputJson.Clone);
   try
@@ -505,7 +509,7 @@ var
   LResponse: IResponse;
   LUrl: string;
   LStatus: Integer;
-  LBodyToSend: TJSONObject;
+  LBodyToSend: TJSONObject = nil;
 begin
   ClearLastResponse;
 

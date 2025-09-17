@@ -62,8 +62,8 @@ function ConvertObject(const AObj: TJSONObject): TJSONObject;
 var
   LI: Integer;
   LName: TJSONStringType;
-  LItem: TJSONData;
-  LNew: TJSONData;
+  LItem: TJSONData = nil;
+  LNew: TJSONData = nil;
 begin
   Result := TJSONObject.Create;
   if AObj = nil then
@@ -145,7 +145,7 @@ end;
 
 function JSONGetFloat(AObj: TJSONObject; const AKey: string): Double;
 var
-  LData: TJSONData;
+  LData: TJSONData = nil;
   LStr: string;
   LFS: TFormatSettings;
 begin
@@ -184,7 +184,7 @@ end;
 
 function JSONGetInt(AObj: TJSONObject; const AKey: string): Integer;
 var
-  LData: TJSONData;
+  LData: TJSONData = nil;
   LStr: string;
 begin
   Result := 0;
@@ -210,7 +210,7 @@ end;
 
 function JSONGetInt64(AObj: TJSONObject; const AKey: string): Int64;
 var
-  LData: TJSONData;
+  LData: TJSONData = nil;
   LStr: string;
 begin
   Result := 0;
@@ -237,7 +237,7 @@ end;
 function JSONGetString(AObj: TJSONObject; const AKey: string;
   const ADefaultValue: string): string;
 var
-  D: TJSONData;
+  D: TJSONData = nil;
   LFS: TFormatSettings;
 begin
   Result := ADefaultValue;
@@ -271,7 +271,7 @@ end;
 function JSONGetBool(AObj: TJSONObject; const AKey: string;
   const ADefaultValue: Boolean): Boolean;
 var
-  D: TJSONData;
+  D: TJSONData = nil;
   S: String;
 begin
   Result := ADefaultValue;
@@ -306,7 +306,7 @@ end;
 
 function SafeGetObj(AParent: TJSONObject; const AName: string): TJSONObject;
 var
-  LData: TJSONData;
+  LData: TJSONData = nil;
 begin
   Result := nil;
   if AParent = nil then
@@ -321,7 +321,7 @@ end;
 
 function SafeGetArr(AParent: TJSONObject; const AName: string): TJSONArray;
 var
-  LData: TJSONData;
+  LData: TJSONData = nil;
 begin
   Result := nil;
   if AParent = nil then

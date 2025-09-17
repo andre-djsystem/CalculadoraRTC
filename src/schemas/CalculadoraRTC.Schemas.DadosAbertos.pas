@@ -432,7 +432,7 @@ end;
 
 class function TVersaoOutput.FromJSON(AJson: TJSONData): IVersaoOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TVersaoOutput;
 begin
   LOut := TVersaoOutput.Create;
@@ -482,7 +482,7 @@ end;
 
 class function TUFOutput.FromJSON(AJson: TJSONData): IUFOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TUFOutput;
 begin
   LOut := TUFOutput.Create;
@@ -520,15 +520,19 @@ end;
 
 class function TMunicipioOutput.FromJSON(AJson: TJSONData): IMunicipioOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TMunicipioOutput;
 begin
   LOut := TMunicipioOutput.Create;
   if (AJson <> nil) and (AJson.JSONType = jtObject) then
   begin
     LObj := TJSONObject(AJson);
-    LOut.fpCodigo := JSONGetInt64(LObj, 'codigo');
-    LOut.fpNome := JSONGetString(LObj, 'nome', '');
+    try
+      LOut.fpCodigo := JSONGetInt64(LObj, 'codigo');
+      LOut.fpNome := JSONGetString(LObj, 'nome', '');
+    finally
+      LObj.Free;
+    end;
   end;
   Result := LOut;
 end;
@@ -552,7 +556,7 @@ end;
 
 class function TSituacaoTributariaOutput.FromJSON(AJson: TJSONData): ISituacaoTributariaOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TSituacaoTributariaOutput;
 begin
   LOut := TSituacaoTributariaOutput.Create;
@@ -590,7 +594,7 @@ end;
 
 class function TNcmOutput.FromJSON(AJson: TJSONData): INcmOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TNcmOutput;
 begin
   LOut := TNcmOutput.Create;
@@ -658,7 +662,7 @@ end;
 
 class function TNbsOutput.FromJSON(AJson: TJSONData): INbsOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TNbsOutput;
 begin
   LOut := TNbsOutput.Create;
@@ -720,7 +724,7 @@ end;
 
 class function TFundamentacaoClassificacaoOutput.FromJSON(AJson: TJSONData): IFundamentacaoClassificacaoOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TFundamentacaoClassificacaoOutput;
 begin
   LOut := TFundamentacaoClassificacaoOutput.Create;
@@ -788,7 +792,7 @@ end;
 
 class function TClassificacaoTributariaOutput.FromJSON(AJson: TJSONData): IClassificacaoTributariaOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TClassificacaoTributariaOutput;
 begin
   LOut := TClassificacaoTributariaOutput.Create;
@@ -904,7 +908,7 @@ end;
 
 class function TAliquotaOutput.FromJSON(AJson: TJSONData): IAliquotaOutput;
 var
-  LObj: TJSONObject;
+  LObj: TJSONObject = nil;
   LOut: TAliquotaOutput;
 begin
   LOut := TAliquotaOutput.Create;

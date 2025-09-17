@@ -3,14 +3,16 @@
   <ProjectSession>
     <PathDelim Value="\"/>
     <Version Value="12"/>
-    <BuildModes Active="Default"/>
+    <BuildModes Active="Debug"/>
     <Units>
       <Unit>
         <Filename Value="CalculadoraRTC.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="41" Y="22"/>
-        <UsageCount Value="47"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="5"/>
+        <CursorPos X="14" Y="28"/>
+        <UsageCount Value="60"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uprincipal.pas"/>
@@ -19,10 +21,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uPrincipal"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="608"/>
-        <CursorPos Y="619"/>
-        <UsageCount Value="47"/>
+        <TopLine Value="604"/>
+        <CursorPos Y="623"/>
+        <UsageCount Value="60"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -31,7 +32,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="509"/>
         <CursorPos Y="539"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="20"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit>
       <Unit>
@@ -39,65 +40,67 @@
         <UnitName Value="CalculadoraRTC.Calculadora"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="32" Y="6"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="20"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\utils\CalculadoraRTC.Utils.JSON.pas"/>
-        <EditorIndex Value="8"/>
-        <TopLine Value="255"/>
-        <CursorPos Y="269"/>
-        <UsageCount Value="24"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="104"/>
+        <CursorPos X="8" Y="127"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\config\CalculadoraRTC.Config.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="9"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="20"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\utils\CalculadoraRTC.Utils.Logging.pas"/>
         <EditorIndex Value="2"/>
         <CursorPos X="3" Y="14"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="29"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\utils\CalculadoraRTC.Utils.Net.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="83"/>
-        <CursorPos X="5" Y="110"/>
-        <UsageCount Value="22"/>
+        <CursorPos X="13" Y="110"/>
+        <UsageCount Value="28"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Core.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="618"/>
-        <CursorPos Y="648"/>
-        <UsageCount Value="22"/>
+        <EditorIndex Value="15"/>
+        <TopLine Value="727"/>
+        <CursorPos X="34" Y="745"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.Pedagio.pas"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="97"/>
-        <CursorPos X="37" Y="104"/>
-        <UsageCount Value="23"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="253"/>
+        <CursorPos X="19" Y="282"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Inputs.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="50"/>
-        <CursorPos Y="65"/>
-        <UsageCount Value="22"/>
+        <TopLine Value="371"/>
+        <CursorPos X="44" Y="389"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.DadosAbertos.pas"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="284"/>
-        <CursorPos X="81" Y="302"/>
-        <UsageCount Value="24"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="370"/>
+        <CursorPos Y="394"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -105,65 +108,84 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos X="32" Y="54"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="20"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\modules\restrequest4delphi\src\RESTRequest4D.Request.Synapse.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="536"/>
         <CursorPos X="37" Y="542"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="20"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\modules\restrequest4delphi\src\RESTRequest4D.Request.Contract.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="84"/>
         <CursorPos X="17" Y="98"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="20"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\utils\CalculadoraRTC.Utils.Payload.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="9"/>
-        <CursorPos X="11" Y="11"/>
-        <UsageCount Value="22"/>
+        <EditorIndex Value="12"/>
+        <CursorPos X="41" Y="15"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.BaseCalculo.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="41"/>
-        <CursorPos X="15" Y="56"/>
-        <UsageCount Value="24"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="372"/>
+        <CursorPos X="51" Y="390"/>
+        <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.ISel.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="16"/>
-        <CursorPos X="3" Y="31"/>
-        <UsageCount Value="21"/>
+        <EditorIndex Value="13"/>
+        <TopLine Value="112"/>
+        <CursorPos X="49" Y="132"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\rtl\objpas\fgl.pp"/>
-        <EditorIndex Value="7"/>
-        <TopLine Value="982"/>
-        <CursorPos Y="997"/>
-        <UsageCount Value="16"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="910"/>
+        <CursorPos Y="930"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.IBSCBS.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="898"/>
-        <CursorPos X="45" Y="912"/>
-        <UsageCount Value="12"/>
+        <EditorIndex Value="14"/>
+        <TopLine Value="988"/>
+        <CursorPos X="45" Y="1007"/>
+        <UsageCount Value="14"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="634"/>
-        <CursorPos X="61" Y="650"/>
-        <UsageCount Value="11"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="265"/>
+        <CursorPos X="30" Y="285"/>
+        <UsageCount Value="17"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\packages\fcl-json\src\fpjson.pp"/>
+        <EditorIndex Value="16"/>
+        <TopLine Value="705"/>
+        <CursorPos X="69" Y="730"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\rtl\inc\objpash.inc"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="188"/>
+        <CursorPos X="23" Y="206"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
@@ -173,122 +195,122 @@
     <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="68" Column="14" TopLine="54"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="255" TopLine="240"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="256" TopLine="240"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="255" TopLine="240"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="257" TopLine="240"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="255" TopLine="240"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="257" TopLine="240"/>
+        <Caret Line="411" TopLine="394"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="646" Column="58" TopLine="636"/>
+        <Caret Line="373" TopLine="355"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="120" Column="14" TopLine="107"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="259" TopLine="240"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Inputs.pas"/>
-        <Caret Line="13"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Inputs.pas"/>
-        <Caret Line="67" Column="4" TopLine="52"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Inputs.pas"/>
-        <Caret Line="344" TopLine="331"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Inputs.pas"/>
-        <Caret Line="241" TopLine="226"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Inputs.pas"/>
-        <Caret Line="187" TopLine="172"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\src\schemas\CalculadoraRTC.Schemas.ROC.Inputs.pas"/>
-        <Caret Line="161" TopLine="146"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="259" TopLine="240"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="619" Column="57" TopLine="613"/>
+        <Caret Line="553" TopLine="535"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="68" Column="53" TopLine="54"/>
+        <Caret Line="373" TopLine="355"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="116" Column="15" TopLine="98"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="279" Column="3" TopLine="276"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="131" Column="24" TopLine="104"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="191" Column="18" TopLine="187"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="192" Column="28" TopLine="187"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="196" Column="32" TopLine="183"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="374" TopLine="356"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="564" TopLine="546"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="374" TopLine="356"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="116" Column="15" TopLine="98"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="282" Column="33" TopLine="277"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="67" Column="53" TopLine="43"/>
+        <Caret Line="109" Column="23" TopLine="80"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="68" Column="53" TopLine="44"/>
+        <Caret Line="196" Column="25" TopLine="167"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="171" Column="112" TopLine="146"/>
+        <Caret Line="202" Column="33" TopLine="173"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="652" Column="48" TopLine="630"/>
+        <Caret Line="203" Column="23" TopLine="174"/>
       </Position>
       <Position>
         <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Caret Line="650" Column="61" TopLine="634"/>
+        <Caret Line="231" Column="31" TopLine="202"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="282" Column="33" TopLine="253"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="283" Column="23" TopLine="254"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="356" Column="25" TopLine="328"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="358" Column="56" TopLine="330"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="359" Column="35" TopLine="331"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="407" Column="21" TopLine="379"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="410" Column="52" TopLine="382"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
+        <Caret Line="412" Column="31" TopLine="384"/>
       </Position>
       <Position>
         <Filename Value="uprincipal.pas"/>
-        <Caret Line="615" Column="30" TopLine="596"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="632" Column="3" TopLine="628"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="563" TopLine="555"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="624" Column="56" TopLine="613"/>
-      </Position>
-      <Position>
-        <Filename Value="uprincipal.pas"/>
-        <Caret Line="619" Column="61" TopLine="609"/>
+        <Caret Line="623" TopLine="604"/>
       </Position>
     </JumpHistory>
     <RunParams>
@@ -296,22 +318,4 @@
       <Modes ActiveMode=""/>
     </RunParams>
   </ProjectSession>
-  <Debugging>
-    <BreakPoints>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="uprincipal.pas"/>
-        <Line Value="619"/>
-      </Item>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="..\..\src\calculadora\CalculadoraRTC.Calculadora.pas"/>
-        <Line Value="646"/>
-      </Item>
-    </BreakPoints>
-  </Debugging>
 </CONFIG>

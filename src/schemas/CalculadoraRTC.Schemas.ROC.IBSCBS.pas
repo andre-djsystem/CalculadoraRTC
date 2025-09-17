@@ -573,7 +573,7 @@ end;
 class function TROC_IBSUF.FromJSON(AObj: TJSONObject): IROCIBSUF;
 var
   L: TROC_IBSUF;
-  S: TJSONObject;
+  S: TJSONObject = nil;
 begin
   L := TROC_IBSUF.Create;
   if AObj <> nil then
@@ -641,7 +641,7 @@ end;
 class function TROC_IBSMun.FromJSON(AObj: TJSONObject): IROCIBSMun;
 var
   L: TROC_IBSMun;
-  S: TJSONObject;
+  S: TJSONObject = nil;
 begin
   L := TROC_IBSMun.Create;
   if AObj <> nil then
@@ -709,7 +709,7 @@ end;
 class function TROC_CBS.FromJSON(AObj: TJSONObject): IROCCBS;
 var
   L: TROC_CBS;
-  S: TJSONObject;
+  S: TJSONObject = nil;
 begin
   L := TROC_CBS.Create;
   if AObj <> nil then
@@ -777,7 +777,7 @@ end;
 class function TROC_GrupoIBSCBS.FromJSON(AObj: TJSONObject): IROCGrupoIBSCBS;
 var
   L: TROC_GrupoIBSCBS;
-  S: TJSONObject;
+  S: TJSONObject = nil;
 begin
   L := TROC_GrupoIBSCBS.Create;
   if AObj <> nil then
@@ -946,7 +946,7 @@ end;
 class function TROCIBSCBSGroup.FromJSON(AObj: TJSONObject): IROCIBSCBS;
 var
   L: TROCIBSCBSGroup;
-  S: TJSONObject;
+  S: TJSONObject = nil;
 begin
   L := TROCIBSCBSGroup.Create;
   if AObj <> nil then

@@ -5,7 +5,7 @@ unit CalculadoraRTC.Schemas.ROC.Inputs;
 interface
 
 uses
-  Classes, SysUtils, fpjson,
+  Classes, SysUtils, fpjson, fgl,
   CalculadoraRTC.Utils.JSON,
   CalculadoraRTC.Utils.DateTime;
 
@@ -96,9 +96,11 @@ type
     function ToJSON: TJSONObject;
   end;
 
+  TOperacaoInput = class;
+
   TItemOperacaoInput = class(TInterfacedObject, IItemOperacaoInput)
   private
-    fpParent: IOperacaoInput;
+    fpParent: TOperacaoInput;
     fpNumero: Integer;
     fpNCM: string;
     fpNBS: string;
@@ -110,8 +112,8 @@ type
     fpTributacaoRegular: ITributacaoRegularInput;
     fpCClassTrib: string;
   public
-    constructor Create(const AParent: IOperacaoInput);
-    class function New(const AParent: IOperacaoInput): IItemOperacaoInput; static;
+    constructor Create(const AParent: TOperacaoInput);
+    class function New(const AParent: TOperacaoInput): IItemOperacaoInput; static;
 
     { IItemOperacaoInput }
     function Numero(const AValue: Integer): IItemOperacaoInput;
@@ -130,15 +132,25 @@ type
     function ToJSON: TJSONObject;
   end;
 
+  generic TInterfacedList<T> = class(specialize TFPGInterfacedObjectList<T>)
+  end;
+
+  { TOperacaoInput }
+
   TOperacaoInput = class(TInterfacedObject, IOperacaoInput)
+  private
+    type
+      TListaItemOperacao = specialize TInterfacedList<IItemOperacaoInput>;
   private
     fpId: string;
     fpVersao: string;
     fpDataHoraEmissao: string;
     fpMunicipio: Int64;
     fpUF: string;
-    fpItens: array of IItemOperacaoInput;
+    fpItens: TListaItemOperacao;
   public
+    constructor Create;
+    destructor Destroy; override;
     class function New: IOperacaoInput; static;
 
     { IOperacaoInput }
@@ -232,13 +244,13 @@ begin
   Result.Add('cClassTrib', fpCClassTrib);
 end;
 
-constructor TItemOperacaoInput.Create(const AParent: IOperacaoInput);
+constructor TItemOperacaoInput.Create(const AParent: TOperacaoInput);
 begin
   inherited Create;
   fpParent := AParent;
 end;
 
-class function TItemOperacaoInput.New(const AParent: IOperacaoInput): IItemOperacaoInput;
+class function TItemOperacaoInput.New(const AParent: TOperacaoInput): IItemOperacaoInput;
 begin
   Result := TItemOperacaoInput.Create(AParent);
 end;
@@ -309,7 +321,7 @@ end;
 
 function TItemOperacaoInput.&End: IOperacaoInput;
 begin
-  Result := fpParent;
+  Result := fpParent as IOperacaoInput;
 end;
 
 function TItemOperacaoInput.ToJSON: TJSONObject;
@@ -331,6 +343,18 @@ begin
   if fpTributacaoRegular <> nil then
     Result.Add('tributacaoRegular', fpTributacaoRegular.ToJSON);
   Result.Add('cClassTrib', fpCClassTrib);
+end;
+
+constructor TOperacaoInput.Create;
+begin
+  inherited Create;
+  fpItens := TListaItemOperacao.Create;
+end;
+
+destructor TOperacaoInput.Destroy;
+begin
+  fpItens.Free;
+  inherited Destroy;
 end;
 
 class function TOperacaoInput.New: IOperacaoInput;
@@ -377,18 +401,15 @@ end;
 function TOperacaoInput.AddItem: IItemOperacaoInput;
 var
   L: IItemOperacaoInput;
-  N: Integer;
 begin
   L := TItemOperacaoInput.New(Self);
-  N := Length(fpItens);
-  SetLength(fpItens, N + 1);
-  fpItens[N] := L;
+  fpItens.Add(L);
   Result := L;
 end;
 
 function TOperacaoInput.ToJSON: TJSONObject;
 var
-  LArr: TJSONArray;
+  LArr: TJSONArray = nil;
   I: Integer;
 begin
   Result := TJSONObject.Create;
@@ -399,9 +420,10 @@ begin
   Result.Add('uf', fpUF);
 
   LArr := TJSONArray.Create;
-  for I := 0 to High(fpItens) do
+  for I := 0 to (fpItens.Count - 1) do
     LArr.Add(fpItens[I].ToJSON);
   Result.Add('itens', LArr);
+  LArr := nil;
 end;
 
 end.

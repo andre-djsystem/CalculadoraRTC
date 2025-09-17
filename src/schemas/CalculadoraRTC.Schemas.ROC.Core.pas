@@ -690,7 +690,7 @@ class function TROC.FromJSON(AJson: TJSONData): IROC;
 var
   LSelf: TROC;
   LObj: TJSONObject = nil;
-  LArr: TJSONArray;
+  LArr: TJSONArray = nil;
   I: Integer;
   LItem: TJSONObject = nil;
   LObjeto: IROCObjeto;
@@ -744,17 +744,21 @@ end;
 
 function TROC.ToJSON: TJSONObject;
 var
-  LArr: TJSONArray;
+  LArr: TJSONArray = nil;
   I: Integer;
 begin
   Result := TJSONObject.Create;
 
   // objetos
   LArr := TJSONArray.Create;
-  for I := 0 to fpObjetos.Count - 1 do
-    if fpObjetos[I] <> nil then
-      LArr.Add(fpObjetos[I].ToJSON);
-  Result.Add('objetos', LArr);
+  try
+    for I := 0 to fpObjetos.Count - 1 do
+      if fpObjetos[I] <> nil then
+        LArr.Add(fpObjetos[I].ToJSON);
+    Result.Add('objetos', LArr.Clone);
+  finally
+    LArr.Free;
+  end;
 
   // total
   if fpTotal <> nil then

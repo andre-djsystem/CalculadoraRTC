@@ -452,9 +452,10 @@ end;
 
 procedure TFormCalcDemo.btnGerarXMLClick(Sender: TObject);
 var
-  LROCJson: TJSONData;
+  LROCJson: TJSONObject = nil;
   LXML: string;
   LInput: IOperacaoInput;
+  LItem: IItemOperacaoInput;
 begin
   ApplyConfig;
   LInput := TOperacaoInput.Create;
@@ -464,23 +465,20 @@ begin
         .Municipio(StrToInt64Safe(edtMunicipio.Text))
         .UF(edtUF.Text);
 
-  with LInput.AddItem do
-  begin
-    Numero(1);
-    CClassTrib(edtCClassTribItem.Text);
-    CST(edtCSTItem.Text);
-    BaseCalculo(StrToDblSafe(edtBaseCalculoItem.Text));
-    Quantidade(StrToDblSafe(edtQtdItem.Text));
-    Unidade(edtUnItem.Text);
-    if edtNCM.Text <> '' then
-      NCM(edtNCM.Text)
-    else if edtNBS.Text <> '' then
-      NBS(edtNBS.Text);
-  end;
+  LItem := LInput.AddItem;
+  LItem
+    .Numero(1)
+    .CClassTrib(edtCClassTribItem.Text)
+    .CST(edtCSTItem.Text)
+    .BaseCalculo(StrToDblSafe(edtBaseCalculoItem.Text))
+    .Quantidade(StrToDblSafe(edtQtdItem.Text))
+    .Unidade(edtUnItem.Text)
+    .NCM(edtNCM.Text)
+    .NBS(edtNBS.Text);
 
-  LROCJson := fpCalculadora.CalcularRegimeGeralJSON(LInput);
+  LROCJson := TJSONObject(fpCalculadora.CalcularRegimeGeralJSON(LInput));
   try
-    LXML := fpCalculadora.GerarXml(TJSONObject(LROCJson.Clone));
+    LXML := fpCalculadora.GerarXml(LROCJson);
     MemoXML.Lines.Text := LXML;
     LogOk('Gerar XML');
   finally

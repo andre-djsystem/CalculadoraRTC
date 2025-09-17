@@ -415,11 +415,16 @@ begin
   Result := fpLastResponseJSON;
 end;
 
-{=== Endpoints ===}
-
 function TCalculadoraRTCCalculadora.CalcularRegimeGeralJSON(const AOperacao: IOperacaoInput): TJSONData;
+var
+  LReq: TJSONObject = nil;
 begin
-  Result := DoPostJSON('calculadora/regime-geral', AOperacao.ToJSON);
+  LReq := AOperacao.ToJSON;
+  try
+    Result := DoPostJSON('calculadora/regime-geral', LReq);
+  finally
+    LReq.Free;
+  end;
 end;
 
 function TCalculadoraRTCCalculadora.CalcularRegimeGeral(const AOperacao: IOperacaoInput): IROC;

@@ -175,8 +175,8 @@ begin
   fpCalculadora.Logger(fpLogger);
 
 //  edtBaseUrl.Text := 'https://piloto-cbs.tributos.gov.br/servico/calculadora-consumo/api';
-  edtBaseUrl.Text := 'http://[::1]:8080/api';
-//  edtBaseUrl.Text := 'http://calculadora.djsystem.com.br/api';
+//  edtBaseUrl.Text := 'http://[::1]:8080/api';
+  edtBaseUrl.Text := 'http://calculadora.djsystem.com.br/api';
   edtTimeout.Text := '5000';
   edtUserAgent.Text := 'CalculadoraRTC-Demo/1.0';
 
